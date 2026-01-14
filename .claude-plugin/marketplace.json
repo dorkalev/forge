@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "forge",
+  "name": "dorkalev",
   "version": "1.0.0",
   "description": "Claude Code skills for Linear-integrated development workflows",
   "owner": {
