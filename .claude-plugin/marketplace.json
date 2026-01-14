@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dorkalev",
+  "version": "1.0.0",
+  "description": "Claude Code plugins for Linear-integrated development workflows",
+  "owner": {
+    "name": "Dor Kalev",
+    "email": "dor@dorkalev.com"
+  },
+  "plugins": [
+    {
+      "name": "forge",
+      "description": "Commands for Linear-integrated development workflows",
+      "source": ".",
+      "category": "productivity",
+      "version": "1.0.0"
+    }
+  ]
+}
