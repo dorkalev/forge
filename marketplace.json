@@ -1,0 +1,63 @@
+{
+  "name": "forge",
+  "description": "Claude Code skills for Linear-integrated development workflows",
+  "author": "dorkalev",
+  "repository": "https://github.com/dorkalev/forge",
+  "skills": [
+    {
+      "name": "ticket",
+      "path": "skills/ticket",
+      "description": "Fetch Linear ticket, save requirements, and create technical implementation plan"
+    },
+    {
+      "name": "issues",
+      "path": "skills/issues",
+      "description": "Show your assigned Linear issues or create a new one"
+    },
+    {
+      "name": "new-issue",
+      "path": "skills/new-issue",
+      "description": "Create a new Linear ticket and set up the full dev environment"
+    },
+    {
+      "name": "ticketify",
+      "path": "skills/ticketify",
+      "description": "Create a Linear ticket from planning discussion and save issue/spec files"
+    },
+    {
+      "name": "worktree",
+      "path": "skills/worktree",
+      "description": "Create a git worktree for an existing branch"
+    },
+    {
+      "name": "pr",
+      "path": "skills/pr",
+      "description": "Open the GitHub PR page for the current branch in browser"
+    },
+    {
+      "name": "audit",
+      "path": "skills/audit",
+      "description": "Check SOC2 compliance status for current branch (read-only)"
+    },
+    {
+      "name": "finish",
+      "path": "skills/finish",
+      "description": "Run pre-push compliance workflow (cleanup, tests, CodeRabbit review)"
+    },
+    {
+      "name": "fix-pr",
+      "path": "skills/fix-pr",
+      "description": "Auto-fix CodeRabbit review findings in continuous loop"
+    },
+    {
+      "name": "cleanup",
+      "path": "skills/cleanup",
+      "description": "Clean up a worktree after its PR is merged"
+    },
+    {
+      "name": "forge",
+      "path": "skills/forge",
+      "description": "List all available skills with explanations"
+    }
+  ]
+}
