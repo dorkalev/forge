@@ -2,7 +2,7 @@
 description: List all available commands
 ---
 
-# /forge - Available Commands
+# /help - Available Commands
 
 Output the following command reference:
 
@@ -47,5 +47,5 @@ Available Commands:
 
 -- Help ------------------------------------------------------------------
 
-/forge:forge            Show this help message.
+/forge:help             Show this help message.
 ```
