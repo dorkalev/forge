@@ -6,7 +6,7 @@ description: Open the GitHub PR page for the current branch in browser.
 
 Open the GitHub PR page for the current branch in the default browser.
 
-**Prerequisites**: GitHub MCP server should be configured in `.mcp.json`
+**Prerequisites**: `gh` CLI must be authenticated (`gh auth login`)
 
 ## Usage
 
@@ -32,15 +32,7 @@ gh repo view --json owner,name --jq '"\(.owner.login)/\(.name)"'
 
 ### Step 3: Check if PR Exists
 
-Use GitHub MCP to search for an existing PR for this branch:
-
-```
-github_search_pull_requests(
-  query: "repo:{owner}/{repo} head:{branch_name} is:pr"
-)
-```
-
-Or fall back to gh CLI:
+Use `gh` CLI to search for an existing PR for this branch:
 ```bash
 gh pr list --head "${BRANCH_NAME}" --json number,url
 ```

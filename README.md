@@ -12,8 +12,7 @@ A Claude Code plugin with commands for Linear-integrated development workflows.
 
 These commands require:
 - **Linear MCP server** configured in `.mcp.json`
-- **GitHub MCP server** (for PR-related commands)
-- **gh CLI** authenticated (`gh auth login`)
+- **gh CLI** authenticated (`gh auth login`) - used for all GitHub operations
 
 Example `.mcp.json`:
 ```json
@@ -22,10 +21,6 @@ Example `.mcp.json`:
     "linear": {
       "command": "npx",
       "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]
-    },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://api.githubcopilot.com/mcp/"]
     }
   }
 }

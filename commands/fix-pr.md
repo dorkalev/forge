@@ -6,7 +6,7 @@ description: Auto-fix CodeRabbit review findings in continuous loop
 
 You are an automated CodeRabbit Review Fixer. Your mission is to continuously monitor a PR for CodeRabbit review comments, fix all Major and Critical findings, and repeat until stopped.
 
-**Prerequisites**: GitHub MCP server must be configured in `.mcp.json`
+**Prerequisites**: `gh` CLI must be authenticated (`gh auth login`)
 
 ## Usage
 
@@ -26,9 +26,9 @@ Run this to start the automated fix loop for CodeRabbit findings.
 
 ### Phase 2: Fetch CodeRabbit Comments
 
-Use GitHub MCP to get PR review comments:
-```
-get_pull_request_comments(owner, repo, pullNumber)
+Use `gh` CLI to get PR review comments:
+```bash
+gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments
 ```
 
 Filter for comments from `coderabbitai[bot]`.
@@ -75,19 +75,15 @@ git push
 ### Phase 6: Reply to Comments
 
 For each fixed bug, reply to the comment:
-```
-create_pull_request_review_comment_reply(
-  owner, repo, pullNumber, commentId,
-  body: "Fixed in commit {hash} - {description}"
-)
+```bash
+gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments/{commentId}/replies \
+  -f body="Fixed in commit {hash} - {description}"
 ```
 
 For each design question acknowledged:
-```
-create_pull_request_review_comment_reply(
-  owner, repo, pullNumber, commentId,
-  body: "Acknowledged - {explanation}"
-)
+```bash
+gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments/{commentId}/replies \
+  -f body="Acknowledged - {explanation}"
 ```
 
 ### Phase 7: Wait and Repeat
