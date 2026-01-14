@@ -1,5 +1,4 @@
 ---
-name: ticketify
 description: Create a Linear ticket from planning discussion and save issue/spec files
 ---
 

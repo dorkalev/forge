@@ -1,5 +1,4 @@
 ---
-name: audit
 description: Check SOC2 compliance status for current branch (read-only)
 ---
 

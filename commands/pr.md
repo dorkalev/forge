@@ -1,5 +1,4 @@
 ---
-name: pr
 description: Open the GitHub PR page for the current branch in browser.
 ---
 

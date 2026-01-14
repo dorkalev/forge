@@ -1,5 +1,4 @@
 ---
-name: fix-pr
 description: Auto-fix CodeRabbit review findings in continuous loop
 ---
 

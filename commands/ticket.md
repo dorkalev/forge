@@ -1,5 +1,4 @@
 ---
-name: ticket
 description: Fetch Linear ticket, save requirements, and create technical implementation plan
 ---
 
