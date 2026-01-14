@@ -11,7 +11,10 @@
     {
       "name": "forge",
       "description": "Commands for Linear-integrated development workflows",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "dorkalev/forge"
+      },
       "category": "productivity",
       "version": "1.0.0"
     }
