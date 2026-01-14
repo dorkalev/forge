@@ -1,5 +1,4 @@
 ---
-name: new-issue
 description: Create a new Linear ticket from a description and set up the full dev environment
 ---
 

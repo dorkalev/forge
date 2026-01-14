@@ -1,5 +1,4 @@
 ---
-name: finish
 description: Run pre-push compliance workflow (cleanup, tests, CodeRabbit review, sync)
 ---
 

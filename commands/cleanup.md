@@ -1,5 +1,4 @@
 ---
-name: cleanup
 description: Clean up a worktree after its PR is merged. Removes worktree, deletes branches, and kills tmux session.
 ---
 

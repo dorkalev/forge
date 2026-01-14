@@ -1,5 +1,4 @@
 ---
-name: worktree
 description: Create a git worktree for an existing branch. Use this when the branch already exists and you just need a worktree.
 ---
 

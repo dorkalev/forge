@@ -1,5 +1,4 @@
 ---
-name: issues
 description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and opens Claude in tmux with the ticket.
 ---
 

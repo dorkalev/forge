@@ -1,14 +1,13 @@
 ---
-name: forge
-description: List all available skills with explanations
+description: List all available commands
 ---
 
-# /forge - Available Skills
+# /forge - Available Commands
 
-Output the following skill reference:
+Output the following command reference:
 
 ```
-Available Skills:
+Available Commands:
 
 -- Planning --------------------------------------------------------------
 
