@@ -1,63 +1,89 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "forge",
+  "version": "1.0.0",
   "description": "Claude Code skills for Linear-integrated development workflows",
-  "author": "dorkalev",
-  "repository": "https://github.com/dorkalev/forge",
-  "skills": [
+  "owner": {
+    "name": "Dor Kalev",
+    "email": "dor@dorkalev.com"
+  },
+  "plugins": [
     {
       "name": "ticket",
-      "path": "skills/ticket",
-      "description": "Fetch Linear ticket, save requirements, and create technical implementation plan"
+      "description": "Fetch Linear ticket, save requirements, and create technical implementation plan",
+      "source": "./skills/ticket",
+      "category": "development",
+      "version": "1.0.0"
     },
     {
       "name": "issues",
-      "path": "skills/issues",
-      "description": "Show your assigned Linear issues or create a new one"
+      "description": "Show your assigned Linear issues or create a new one",
+      "source": "./skills/issues",
+      "category": "development",
+      "version": "1.0.0"
     },
     {
       "name": "new-issue",
-      "path": "skills/new-issue",
-      "description": "Create a new Linear ticket and set up the full dev environment"
+      "description": "Create a new Linear ticket and set up the full dev environment",
+      "source": "./skills/new-issue",
+      "category": "development",
+      "version": "1.0.0"
     },
     {
       "name": "ticketify",
-      "path": "skills/ticketify",
-      "description": "Create a Linear ticket from planning discussion and save issue/spec files"
+      "description": "Create a Linear ticket from planning discussion and save issue/spec files",
+      "source": "./skills/ticketify",
+      "category": "development",
+      "version": "1.0.0"
     },
     {
       "name": "worktree",
-      "path": "skills/worktree",
-      "description": "Create a git worktree for an existing branch"
+      "description": "Create a git worktree for an existing branch",
+      "source": "./skills/worktree",
+      "category": "development",
+      "version": "1.0.0"
     },
     {
       "name": "pr",
-      "path": "skills/pr",
-      "description": "Open the GitHub PR page for the current branch in browser"
+      "description": "Open the GitHub PR page for the current branch in browser",
+      "source": "./skills/pr",
+      "category": "development",
+      "version": "1.0.0"
     },
     {
       "name": "audit",
-      "path": "skills/audit",
-      "description": "Check SOC2 compliance status for current branch (read-only)"
+      "description": "Check SOC2 compliance status for current branch (read-only)",
+      "source": "./skills/audit",
+      "category": "productivity",
+      "version": "1.0.0"
     },
     {
       "name": "finish",
-      "path": "skills/finish",
-      "description": "Run pre-push compliance workflow (cleanup, tests, CodeRabbit review)"
+      "description": "Run pre-push compliance workflow (cleanup, tests, CodeRabbit review)",
+      "source": "./skills/finish",
+      "category": "productivity",
+      "version": "1.0.0"
     },
     {
       "name": "fix-pr",
-      "path": "skills/fix-pr",
-      "description": "Auto-fix CodeRabbit review findings in continuous loop"
+      "description": "Auto-fix CodeRabbit review findings in continuous loop",
+      "source": "./skills/fix-pr",
+      "category": "productivity",
+      "version": "1.0.0"
     },
     {
       "name": "cleanup",
-      "path": "skills/cleanup",
-      "description": "Clean up a worktree after its PR is merged"
+      "description": "Clean up a worktree after its PR is merged",
+      "source": "./skills/cleanup",
+      "category": "productivity",
+      "version": "1.0.0"
     },
     {
       "name": "forge",
-      "path": "skills/forge",
-      "description": "List all available skills with explanations"
+      "description": "List all available skills with explanations",
+      "source": "./skills/forge",
+      "category": "productivity",
+      "version": "1.0.0"
     }
   ]
 }
