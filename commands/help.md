@@ -45,6 +45,9 @@ UTILITIES (not part of main workflow)
 /forge:pr                 Open PR in browser
 /forge:audit              Dry-run of /forge:finish
 /forge:fix-pr             Re-run CodeRabbit fix loop
+/forge:tmux-list          List tmux sessions and attach in iTerm
+/forge:setup              Install dev tools (iTerm, tmux, Marta, etc.)
 
+/forge:about              Learn how Forge makes SOC2 a superpower
 /forge:help               This message
 ```
