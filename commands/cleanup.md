@@ -152,6 +152,7 @@ Execute cleanup in a single chained command:
 ```bash
 cd "${MAIN_REPO_PATH}" && \
   git worktree remove "${WORKTREE_PATH}" --force && \
+  rm -rf "${WORKTREE_PATH}" && \
   git branch -D "${BRANCH}" 2>/dev/null; \
   git -C "${MAIN_REPO_PATH}" worktree prune
 ```
