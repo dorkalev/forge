@@ -60,9 +60,9 @@ TodoWrite([
   { content: "Phase 4: Issue & Spec File Management", status: "pending" },
   { content: "Phase 5: Commit Changes", status: "pending" },
   { content: "Phase 6: Test Generation", status: "pending" },
-  { content: "Phase 7: Code Review", status: "pending" },
-  { content: "Phase 8: Final Push & PR Ready", status: "pending" },
-  { content: "Phase 9: Fix Review Findings", status: "pending" }
+  { content: "Phase 7: Push & Code Review Loop", status: "pending" },
+  { content: "Phase 8: PR Ready & Linear Sync", status: "pending" },
+  { content: "Phase 9: CodeRabbit Loop", status: "pending" }
 ])
 ```
 
@@ -191,68 +191,83 @@ This will:
 - Run and verify all tests pass
 - Commit the tests
 
-### Phase 7: Code Review
+### Phase 7: Push & Code Review Loop
 
-Invoke `/code-review` (from the official Anthropic code-review plugin) to review the PR.
-
-**Prerequisites**: Install the plugin first:
+**Prerequisites**: Install the Anthropic code-review plugin:
 ```
 /plugin add anthropics/claude-plugins-official/plugins/code-review
 ```
 
-The review will:
-1. Run 5 parallel agents checking bugs, CLAUDE.md compliance, git history, etc.
-2. Score each issue for confidence (0-100)
-3. Only surface issues scoring 80+ to reduce false positives
-4. Post findings as PR comment
-
-If issues are found:
-1. Fix the high-confidence issues
-2. Re-run tests
-3. Commit fixes:
-   ```
-   fix: address code review findings
-   ```
-4. Push and re-run `/code-review` to verify
-
-### Phase 8: Final Push & PR Ready
-
-1. Verify tests pass
-2. Push to remote:
+1. Push to remote (PR must exist for /code-review):
    ```bash
    git push origin <branch-name>
    ```
 
-3. Find existing PR:
+2. Run `/code-review` (Anthropic plugin only)
+   - 5 parallel agents check bugs, CLAUDE.md compliance, git history
+   - Only issues scoring 80+ confidence are surfaced
+
+3. If issues found:
+   - Fix each issue
+   - Re-run tests
+   - Commit: `fix: address code review findings`
+   - Push
+   - Re-run `/code-review`
+
+4. **Repeat until `/code-review` reports "No issues found"**
+
+### Phase 8: PR Ready & Linear Sync
+
+1. Find existing PR:
    ```bash
    gh pr list --head <branch-name> --base staging --json number,url,isDraft
    ```
 
-4. **Convert PR from draft to ready for review**:
+2. **Convert PR from draft to ready for review**:
    ```bash
    gh pr ready <pr-number>
    ```
 
-5. Update PR description with Linear issue table
+3. Update PR description with Linear issue table
 
-6. Add PR link to Linear issue:
+4. Add PR link to Linear issue:
    ```
    linear_add_comment(issueId: "<id>", body: "PR: <url>")
    ```
 
-7. Update Linear issue state to "In Review":
+5. Update Linear issue state to "In Review":
    ```
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
 
-### Phase 9: Fix Review Findings
+### Phase 9: CodeRabbit Loop
 
-If `/code-review` found issues:
-1. Read the PR comment with findings
-2. Fix each high-confidence issue
-3. Commit: `fix: address code review findings`
-4. Push and re-run `/code-review`
-5. Repeat until no issues found
+After PR is ready, CodeRabbit (GitHub bot) will review. Loop until clean:
+
+1. **Wait 3 minutes** for CodeRabbit to review:
+   ```bash
+   sleep 180
+   ```
+
+2. Fetch CodeRabbit comments:
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/{pr-number}/comments
+   ```
+   Filter for `coderabbitai[bot]}`.
+
+3. Check for Major/Critical issues:
+   - **Critical**: `_Critical_` - MUST fix
+   - **Major**: `_Major_` - MUST fix
+   - **Minor/Trivial**: skip
+
+4. If Major/Critical found:
+   - Fix each issue
+   - Commit: `fix: address CodeRabbit findings`
+   - Push
+   - Reply to comment: `Fixed in commit {hash}`
+   - Go back to step 1 (wait 3 min)
+
+5. **Repeat until no Major/Critical issues remain**
 
 ## Quality Gates
 
@@ -264,15 +279,14 @@ Do NOT proceed to push if:
 
 ## Output Summary
 
-Report at completion of Phase 8 (before fix-pr):
+Report at completion:
 - Files changed/removed
-- Features verified against spec (both committed and uncommitted)
+- Features verified against spec
 - Tests added
+- `/code-review` passed (no issues)
 - PR converted from draft to ready
 - Linear issue updated to "In Review"
-- Linear/GitHub links created
-
-Then `/forge:fix-pr` takes over for continuous CodeRabbit fixing.
+- CodeRabbit passed (no Major/Critical)
 
 ## Error Handling
 
