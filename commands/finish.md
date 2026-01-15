@@ -76,7 +76,7 @@ Execute a comprehensive pre-push compliance workflow:
 3. Test coverage
 4. Automated code review compliance
 5. Full Linear/GitHub traceability for SOC2 compliance
-6. Bidirectional sync between `issues/` files and Linear tickets
+6. Bidirectional sync between `issues/` files and Linear issues
 
 ## Product vs Technical Documentation
 
@@ -137,8 +137,8 @@ UNSPECED FEATURE DETECTED:
 Feature: [description]
 
 Options:
-1. Add to current spec - Update the Linear ticket
-2. Create new ticket - Create separate Linear ticket
+1. Add to current spec - Update the Linear issue
+2. Create new issue - Create separate Linear issue
 3. Remove feature - Delete the unspeced code
 ```
 
@@ -150,15 +150,15 @@ Execute choice using Linear MCP:
 ### Phase 4: Issue & Spec File Management
 
 #### 4a: Update Issue File
-1. Update `issues/{TICKET}.md` with scope changes
+1. Update `issues/{ISSUE_ID}.md` with scope changes
 2. Mark acceptance criteria complete: `- [ ]` -> `- [x]`
 3. Keep content PRODUCT-FOCUSED (no code details)
 
 #### 4b: Sync Issue to Linear
-Use Linear MCP to update the ticket description:
+Use Linear MCP to update the issue description:
 ```
 linear_update_issue(
-  issueId: "<ticket-id>",
+  issueId: "<issue-id>",
   description: "<issue file content - product sections only>"
 )
 ```
@@ -167,7 +167,7 @@ Sync these sections: Summary, User Stories, Acceptance Criteria, Scope Clarifica
 
 #### 4c: Update Spec File
 1. Update `specs/{feature-name}.md` with technical details
-2. Reference issue file: `See [{TICKET}-XXX](../issues/{TICKET}-XXX.md) for product requirements`
+2. Reference issue file: `See [{ISSUE_ID}-XXX](../issues/{ISSUE_ID}-XXX.md) for product requirements`
 
 ### Phase 5: Commit Changes
 
@@ -219,14 +219,14 @@ Do NOT push yet.
    gh pr ready <pr-number>
    ```
 
-5. Update PR description with Linear ticket table
+5. Update PR description with Linear issue table
 
-6. Add PR link to Linear ticket:
+6. Add PR link to Linear issue:
    ```
    linear_add_comment(issueId: "<id>", body: "PR: <url>")
    ```
 
-7. Update Linear ticket state to "In Review":
+7. Update Linear issue state to "In Review":
    ```
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
@@ -255,7 +255,7 @@ Report at completion of Phase 8 (before fix-pr):
 - Features verified against spec (both committed and uncommitted)
 - Tests added
 - PR converted from draft to ready
-- Linear ticket updated to "In Review"
+- Linear issue updated to "In Review"
 - Linear/GitHub links created
 
 Then `/forge:fix-pr` takes over for continuous CodeRabbit fixing.

@@ -34,7 +34,7 @@ Error: Not in a worktree
 This command must be run from inside a worktree directory.
 Current directory: {pwd}
 
-Use this command from a worktree created by /issues or /worktree.
+Use this command from a worktree created by /start or /worktree.
 ```
 
 ### Step 2: Gather Worktree Metadata

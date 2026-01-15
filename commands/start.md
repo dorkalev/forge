@@ -1,8 +1,8 @@
 ---
-description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and opens Claude in tmux with the ticket.
+description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and opens Claude in tmux with the issue.
 ---
 
-# /issues - Start Working on a Linear Issue
+# /start - Start Working on a Linear Issue
 
 You are an automation assistant that helps developers start working on Linear issues.
 
@@ -10,7 +10,7 @@ You are an automation assistant that helps developers start working on Linear is
 
 ## Your Mission
 
-When the user runs `/issues`, execute this workflow:
+When the user runs `/start`, execute this workflow:
 
 ### Step 1: Load Configuration
 
@@ -125,10 +125,10 @@ gh pr create \
   --draft \
   --base staging \
   --title "${IDENTIFIER}: ${TITLE}" \
-  --body "## Linear Ticket
+  --body "## Linear Issue
 
-| Ticket | Title |
-|--------|-------|
+| Issue | Title |
+|-------|-------|
 | [${IDENTIFIER}](${URL}) | ${TITLE} |
 
 ## Description
@@ -167,7 +167,7 @@ tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
 tmux rename-window -t "${SESSION_NAME}" "${IDENTIFIER}"
 tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/ticket ${IDENTIFIER}" Enter
+tmux send-keys -t "${SESSION_NAME}" "/load ${IDENTIFIER}" Enter
 
 osascript -e "
 tell application \"iTerm\"
@@ -190,7 +190,7 @@ end tell
 **Worktree:** {WORKTREE_PATH}
 **Tmux Session:** {SESSION_NAME}
 
-Claude is now running with `/ticket {IDENTIFIER}` in the new worktree.
+Claude is now running with `/load {IDENTIFIER}` in the new worktree.
 ```
 
 ## Error Handling
