@@ -1,8 +1,8 @@
 ---
-description: Create a Linear ticket from planning discussion and save issue/spec files
+description: Create a Linear issue from planning discussion and save issue/spec files
 ---
 
-# /ticketify - Turn Planning Discussion into a Linear Ticket
+# /capture - Turn Planning Discussion into a Linear Issue
 
 You are an expert at formalizing planning discussions into structured product requirements and technical specifications.
 
@@ -11,7 +11,7 @@ You are an expert at formalizing planning discussions into structured product re
 ## Usage
 
 ```
-/ticketify
+/capture
 ```
 
 Run this after discussing and planning a feature in the conversation.
@@ -31,7 +31,7 @@ Use `AskUserQuestion`:
 1. **Priority**: Urgent, High, Medium, Low, None
 2. **Labels**: Any labels to apply? (comma-separated or "none")
 
-### Phase 3: Create Linear Ticket
+### Phase 3: Create Linear Issue
 
 Use Linear MCP to create the issue:
 ```
@@ -53,7 +53,7 @@ Create `issues/{TICKET}-{number}.md`:
 
 **Priority:** {Priority}
 **State:** Backlog
-**URL:** {ticket_url}
+**URL:** {issue_url}
 
 ## Summary
 {2-3 sentence business description}
@@ -76,7 +76,7 @@ Create `issues/{TICKET}-{number}.md`:
 
 ### Phase 5: Save Technical Spec
 
-Create `specs/{ticket}-{number}-{feature-name}.md`:
+Create `specs/{issue}-{number}-{feature-name}.md`:
 ```markdown
 # {TICKET}-{number}: {Title} - Technical Spec
 
@@ -109,14 +109,14 @@ Create `specs/{ticket}-{number}-{feature-name}.md`:
 ```
 ## Created: {TICKET}-{number}: {Title}
 
-**Linear ticket**: {ticket_url}
+**Linear issue**: {issue_url}
 
 **Files saved**:
 - `issues/{TICKET}-{number}.md` - Product requirements
-- `specs/{ticket}-{number}-{feature-name}.md` - Technical specification
+- `specs/{issue}-{number}-{feature-name}.md` - Technical specification
 
 **Next steps**:
-- Create branch: `git checkout -b {ticket}-{number}-{feature-name}`
+- Create branch: `git checkout -b {issue}-{number}-{feature-name}`
 - Or use `/issues` to set up the full dev environment
 
 Ready to implement!
@@ -126,4 +126,4 @@ Ready to implement!
 
 - **Linear MCP not available**: Report error, ask user to configure `.mcp.json`
 - **No clear feature in conversation**: Ask user to clarify
-- **Ticket creation fails**: Do not create local files, report the error
+- **Issue creation fails**: Do not create local files, report the error
