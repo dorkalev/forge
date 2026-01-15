@@ -91,7 +91,70 @@ Installing Linear... done
 Installing Slack... done
 ```
 
-### Step 5: Post-Install Configuration
+### Step 5: Configure tmux
+
+Install the optimized tmux configuration for Claude/TUI apps:
+
+```bash
+cat > ~/.tmux.conf << 'EOF'
+# ==========================================
+# FIX CLAUDE / TUI STICKING ISSUES
+# ==========================================
+
+# 1. Enable Mouse Support
+# This allows you to scroll the Claude output with your touchpad,
+# which often un-sticks the rendering if it freezes.
+set -g mouse on
+
+# 2. Fix Colors & Rendering
+# 'tmux-256color' tells applications (like Claude) that this is a
+# high-performance terminal, preventing artifacts.
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+
+# 3. Increase History
+# Prevents the terminal from freaking out when Claude generates long code blocks.
+set -g history-limit 50000
+
+# 4. Remove Input Delay (The "Lag" Fix)
+# By default, tmux waits for escape sequences. This makes TUI apps feel sticky.
+set -s escape-time 0
+
+# 5. Enable Focus Events
+# Helps Claude understand when you click into the pane so it can redraw.
+set -g focus-events on
+
+# ==========================================
+# PREVENT ACCIDENTAL FREEZES (Flow Control)
+# ==========================================
+
+# Unbind keys that pause the terminal output
+unbind C-s
+unbind C-q
+
+# ==========================================
+# OPTIONAL: QUALITY OF LIFE
+# ==========================================
+
+# Reload this config with 'Prefix + r'
+bind r source-file ~/.tmux.conf \; display "Config reloaded!"
+
+# Split panes with | and - (easier to remember)
+bind | split-window -h
+bind - split-window -v
+EOF
+```
+
+If `~/.tmux.conf` already exists, ask before overwriting:
+- Header: "Config"
+- Question: "~/.tmux.conf already exists. Replace with Forge-optimized config?"
+- Options:
+  - "Replace" - Overwrite with the new config
+  - "Skip" - Keep existing config
+
+Report: `Configured ~/.tmux.conf for Claude/TUI compatibility`
+
+### Step 6: Post-Install Configuration
 
 After installation, suggest optional configuration:
 
@@ -99,6 +162,9 @@ After installation, suggest optional configuration:
 ## Setup Complete
 
 All tools installed successfully.
+
+**Configured:**
+- ~/.tmux.conf optimized for Claude Code (mouse, colors, no input lag)
 
 **Optional next steps:**
 - Set iTerm2 as default terminal
