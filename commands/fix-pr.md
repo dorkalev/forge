@@ -21,8 +21,23 @@ Run this to start the automated fix loop for CodeRabbit findings.
 ### Phase 1: Setup
 
 1. Get current branch: `git branch --show-current`
-2. Find the PR using `gh pr list --head <branch> --base staging --json number,url,title`
-3. Check if PR is draft - if so, convert to ready for review and wait 3 minutes for CodeRabbit
+2. Find the PR using `gh pr list --head <branch> --base staging --json number,url,title,isDraft`
+3. Check if PR is draft - if so, convert to ready for review:
+   ```bash
+   gh pr ready <pr-number>
+   ```
+
+4. **Check if PR has any reviews yet**:
+   ```bash
+   gh api repos/{owner}/{repo}/pulls/{pr-number}/reviews --jq 'length'
+   ```
+
+5. **If NO reviews exist (length = 0), wait 7 minutes**:
+   ```
+   echo "No reviews found yet. Waiting 7 minutes for CodeRabbit to review..."
+   sleep 420
+   ```
+   This gives CodeRabbit time to analyze the PR and post its review.
 
 ### Phase 2: Fetch CodeRabbit Comments
 
@@ -112,7 +127,11 @@ The loop continues until:
 ```
 Starting CodeRabbit fix loop for PR #44
 
-[Iteration 1 - 10:30:00]
+Checking for existing reviews...
+No reviews found yet. Waiting 7 minutes for CodeRabbit to review...
+[7 minute wait]
+
+[Iteration 1 - 10:37:00]
 Found 6 CodeRabbit comments
 
 Issues by severity:
