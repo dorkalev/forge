@@ -182,13 +182,108 @@ Do NOT push yet.
 
 ### Phase 6: Test Generation
 
-1. Generate tests for core functionality
-2. Follow project testing conventions
-3. Run tests and ensure they pass
-4. Commit tests:
-   ```
-   test: add coverage for [feature-name]
-   ```
+**Goal**: Heavy test coverage without browser-based tests.
+
+#### 6a: Detect Project Test Patterns
+
+```bash
+# Find existing test files to understand conventions
+find . -name "*_test.py" -o -name "test_*.py" -o -name "*.test.ts" -o -name "*.spec.ts" 2>/dev/null | head -20
+
+# Check test framework in use
+grep -l "pytest\|unittest\|jest\|vitest\|mocha" package.json pyproject.toml setup.py 2>/dev/null
+```
+
+Read 2-3 existing test files to understand:
+- Test file location pattern (e.g., `tests/`, `__tests__/`, co-located)
+- Naming conventions
+- Fixture/mock patterns
+- Assertion style
+
+#### 6b: Identify What Needs Tests
+
+Analyze the changes and categorize:
+
+| Type | What to Test | Priority |
+|------|--------------|----------|
+| **New functions/methods** | Unit tests for each public function | High |
+| **API endpoints** | Integration tests with test client | High |
+| **Data pipelines** | Integration tests with sample data | High |
+| **Config/env changes** | Validation tests | Medium |
+| **Bug fixes** | Regression test proving the fix | High |
+| **Refactors** | Ensure existing tests still pass | N/A |
+
+#### 6c: Test Types to Generate
+
+**Unit Tests** (always):
+- Test individual functions in isolation
+- Mock external dependencies (APIs, databases, cloud services)
+- Cover happy path + edge cases + error cases
+- Aim for high coverage of new/changed code
+
+**Integration Tests** (for pipelines/services):
+- Test full pipeline flows without browser
+- Use real (test) database connections where possible
+- Test Cloud Run services with test HTTP client
+- Test BigQuery operations against test dataset
+- Test pub/sub message flows end-to-end
+
+**What NOT to generate**:
+- Browser-based e2e tests (Playwright, Cypress, Selenium)
+- UI screenshot tests
+- Manual QA scripts
+
+#### 6d: Generate Tests
+
+For each untested change:
+
+1. Create test file following project conventions
+2. Write tests covering:
+   - Normal operation (happy path)
+   - Edge cases (empty input, large input, boundary values)
+   - Error handling (invalid input, service failures, timeouts)
+3. Use descriptive test names: `test_<function>_<scenario>_<expected_result>`
+
+Example structure:
+```python
+class TestFeatureName:
+    """Tests for [feature-name] functionality."""
+
+    def test_happy_path(self):
+        """Should [expected behavior] when [condition]."""
+
+    def test_edge_case_empty_input(self):
+        """Should handle empty input gracefully."""
+
+    def test_error_handling(self):
+        """Should raise [Error] when [condition]."""
+```
+
+#### 6e: Run and Verify
+
+```bash
+# Run tests (detect runner from project)
+pytest tests/ -v --tb=short
+# or
+npm test
+# or
+go test ./...
+```
+
+- All new tests must pass
+- Existing tests must not break
+- If tests fail, fix the code or tests before proceeding
+
+#### 6f: Commit Tests
+
+```bash
+git add -A
+git commit -m "test: add coverage for [feature-name]
+
+- Unit tests for [components]
+- Integration tests for [pipelines/services]
+- Covers [X] new functions/endpoints"
+```
 
 ### Phase 7: CodeRabbit Review
 
