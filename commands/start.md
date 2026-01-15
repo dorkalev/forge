@@ -164,7 +164,7 @@ linear_update_issue(issueId: "<id>", status: "In Progress")
 ```bash
 SESSION_NAME="${IDENTIFIER}"
 tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
-tmux send-keys -t "${SESSION_NAME}" "claude" Enter
+tmux send-keys -t "${SESSION_NAME}" "claude --chrome" Enter
 sleep 3
 tmux send-keys -t "${SESSION_NAME}" "/load ${IDENTIFIER}" Enter
 
