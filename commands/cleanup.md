@@ -12,13 +12,21 @@ When the user runs `/cleanup`, execute this workflow:
 
 ### Step 1: Verify Running in Worktree
 
-Check if the current directory is inside a git worktree:
+Check if the current directory is inside a git worktree by examining the `.git` entry:
 
 ```bash
-COMMON_DIR=$(git rev-parse --git-common-dir 2>/dev/null)
+if [ -f .git ]; then
+  echo "In worktree"
+  cat .git
+else
+  echo "Not in worktree"
+fi
 ```
 
-If `COMMON_DIR` does NOT contain `/.git/worktrees/`, you are in the main repo, not a worktree:
+In a worktree, `.git` is a **file** containing `gitdir: /path/to/main/.git/worktrees/branch-name`.
+In the main repo, `.git` is a **directory**.
+
+If `.git` is NOT a file:
 
 ```
 Error: Not in a worktree
@@ -38,8 +46,9 @@ BRANCH=$(git branch --show-current)
 # Current worktree path
 WORKTREE_PATH=$(pwd)
 
-# Main repo path (strip /.git/worktrees/... suffix)
-MAIN_REPO_PATH=$(git rev-parse --git-common-dir | sed 's|/\.git/worktrees/.*||')
+# Main repo path - extract from the .git file's gitdir pointer
+# The .git file contains: gitdir: /path/to/main/.git/worktrees/branch-name
+MAIN_REPO_PATH=$(cat .git | sed 's|gitdir: ||' | sed 's|/\.git/worktrees/.*||')
 ```
 
 Report what was detected:
@@ -98,12 +107,13 @@ Please push commits first: git push origin {BRANCH}
 PR_DATA=$(gh pr view ${BRANCH} --json state,url 2>&1)
 ```
 
-If no PR found:
+If no PR found or gh CLI fails:
 
 ```
 Error: No PR found for branch {BRANCH}
 
 Cannot verify merge status without a PR.
+If gh CLI auth failed, run: gh auth login
 ```
 
 Parse state:
@@ -133,14 +143,23 @@ Safety checks passed:
 
 ### Step 4: Execute Cleanup
 
-**IMPORTANT:** All cleanup commands must be chained in a single bash invocation. When running from inside a worktree, after `git worktree remove` deletes the directory, the shell's working directory no longer exists. Chaining ensures all commands run in the same session after cd'ing to the main repo.
+**CRITICAL:** After deleting the worktree directory, the shell's working directory becomes invalid. All subsequent commands MUST use `git -C "${MAIN_REPO_PATH}"` to avoid "path does not exist" errors.
+
+**IMPORTANT:** Store all variables before deletion since we can't read `.git` file after removal.
+
+Execute cleanup in a single chained command:
 
 ```bash
 cd "${MAIN_REPO_PATH}" && \
-  git worktree remove "${WORKTREE_PATH}" && \
-  git branch -d "${BRANCH}" && \
-  (git ls-remote --heads origin "${BRANCH}" | grep -q "${BRANCH}" && git push origin --delete "${BRANCH}" || echo "Remote branch already deleted") && \
-  git worktree prune
+  git worktree remove "${WORKTREE_PATH}" --force && \
+  git branch -D "${BRANCH}" 2>/dev/null; \
+  git -C "${MAIN_REPO_PATH}" worktree prune
+```
+
+Then delete remote branch (use `git -C` since cwd may be invalid):
+
+```bash
+git -C "${MAIN_REPO_PATH}" push origin --delete "${BRANCH}" 2>/dev/null || echo "Remote branch already deleted or not found"
 ```
 
 If the worktree remove fails (e.g., process holding files), report error and suggest:
@@ -153,6 +172,20 @@ Error: Failed to remove worktree
 Try:
 1. Close any editors/terminals in the worktree
 2. Force remove: git worktree remove --force {WORKTREE_PATH}
+```
+
+**Recovery if shell cwd is broken:**
+
+If subsequent bash commands fail with "Path ... does not exist", the shell session's working directory is invalid. Use this pattern for all remaining commands:
+
+```bash
+git -C "${MAIN_REPO_PATH}" <command>
+```
+
+Or spawn a fresh shell:
+
+```bash
+/bin/zsh -c 'cd /path/to/main && git <command>'
 ```
 
 ### Step 5: Report Success
@@ -176,10 +209,7 @@ You are now in the main repo: {MAIN_REPO_PATH}
 
 ```bash
 SESSION_NAME="${BRANCH}"
-if tmux has-session -t "${SESSION_NAME}" 2>/dev/null; then
-  echo "Killing tmux session: ${SESSION_NAME}"
-  tmux kill-session -t "${SESSION_NAME}"
-fi
+tmux kill-session -t "${SESSION_NAME}" 2>/dev/null || echo "No tmux session to kill"
 ```
 
 ## Error Handling
@@ -188,8 +218,9 @@ fi
 - **Uncommitted changes:** List files, suggest commit/stash
 - **Unpushed commits:** List commits, suggest push command
 - **PR not merged:** Show PR URL and current state
-- **PR not found:** Suggest checking branch name
+- **PR not found:** Suggest checking branch name or gh auth
 - **Worktree remove fails:** Suggest force remove
+- **Shell cwd broken:** Use `git -C` or `/bin/zsh -c` pattern
 - **Remote branch gone:** Skip silently (already cleaned)
 - **Tmux session gone:** Skip silently (not an error)
 - **gh CLI auth error:** Suggest `gh auth login`
@@ -200,3 +231,5 @@ fi
 - ALWAYS display success report before killing tmux
 - The tmux kill is the absolute last operation
 - If any safety check fails, stop immediately and report
+- Use `git -C` for commands after worktree deletion to avoid cwd issues
+- Use `git branch -D` (force) since PR merge is already verified
