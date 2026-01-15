@@ -8,6 +8,22 @@ Create a new Linear issue and instantly set up the full development environment 
 
 **Prerequisites**: Linear MCP server must be configured in `.mcp.json`
 
+## CRITICAL: Workflow Guardrails
+
+**DO NOT:**
+- Enter plan mode (EnterPlanMode) - this skill IS the planning workflow
+- Start implementing features in the current worktree
+- Get derailed by user discussion - complete all 10 steps first
+- Write code or make changes beyond the issue/spec files
+
+**DO:**
+- Execute steps 1-10 sequentially without interruption
+- Keep "Improve with AI" research brief (< 2 minutes)
+- Create the worktree where ALL planning/implementation will happen
+- Hand off to the NEW Claude session in the new worktree
+
+**Remember:** This skill's ONLY job is to create the ticket + dev environment. The NEW Claude instance in the worktree will do all planning and implementation via `/forge:ticket`.
+
 ## Usage
 
 ```
@@ -36,22 +52,22 @@ Use AskUserQuestion:
 - Header: "Spec"
 - Options:
   - "Create as-is" - Use the description exactly
-  - "Improve with AI" - Analyze codebase and create detailed requirements
+  - "Improve with AI" - Quick codebase scan to flesh out requirements (< 2 min)
 
 ### Step 4: Create the Issue
 
 **If "Create as-is":**
-Use Linear MCP:
-```
-linear_create_issue(
-  title: "<user description>",
-  description: "<user description>",
-  teamId: "<team ID>"
-)
-```
+Use Linear MCP or API to create issue with user's description as both title and description.
 
 **If "Improve with AI":**
-Research codebase, generate improved spec, then create issue with improved content.
+Do a BRIEF (< 2 minute) research:
+1. Quick grep/glob for related files (1-2 searches max)
+2. Identify key files that would be affected
+3. Expand description into: Summary, Requirements (bullets), Acceptance Criteria (checkboxes)
+
+**IMPORTANT:** This is NOT deep planning. Just enough context to create a good ticket. The real planning happens in the new worktree via `/forge:ticket`.
+
+Then create the issue with the improved content.
 
 ### Step 5: Create Branch
 
@@ -166,6 +182,18 @@ Claude is now running with `/ticket {IDENTIFIER}` in the new worktree.
 
 ## Error Handling
 
-- **Linear MCP not available**: Report error, ask user to configure `.mcp.json`
+- **Linear MCP not available**: Fall back to Linear GraphQL API using credentials from `.forge`
 - **No description provided**: Ask user to provide one
 - **Branch creation fails**: Report error with details
+
+## Handling User Tangents
+
+If the user starts discussing implementation details, planning, or asks to "plan!" mid-workflow:
+
+1. Acknowledge their input briefly
+2. Capture any important details they mentioned for the issue description
+3. Remind them: "Let me finish setting up the worktree first - the NEW Claude session there will do the full planning via `/forge:ticket`"
+4. Continue with the remaining steps
+
+**Example response:**
+> "Great context! I'll include that in the issue. Let me finish creating the worktree, then the Claude instance there will dive deep into planning with `/forge:ticket`."
