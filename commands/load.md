@@ -1,8 +1,8 @@
 ---
-description: Fetch Linear ticket, save requirements, and create technical implementation plan
+description: Fetch Linear issue, save requirements, and create technical implementation plan
 ---
 
-# /ticket - Start Working on a Linear Ticket
+# /load - Load an Issue into Current Session
 
 You are an expert technical planner who translates product requirements into actionable implementation plans.
 
@@ -11,34 +11,34 @@ You are an expert technical planner who translates product requirements into act
 ## Usage
 
 ```
-/ticket <id>
-/ticket 277
-/ticket PROJ-277
+/load <id>
+/load 277
+/load ENG-277
 ```
 
 ## Workflow
 
-### Phase 0: Parse Ticket ID
+### Phase 0: Parse Issue ID
 
-- Extract the ticket prefix from existing issues or the Linear workspace
+- Extract the issue prefix from existing issues or the Linear workspace
 - If numeric only (e.g., `277`), prefix with detected project prefix
 - Normalize to uppercase: `{PREFIX}-{number}`
 
 ### Phase 1: Check for Existing Work
 
 ```bash
-git branch -a | grep -i "{ticket-id}"
-gh pr list --search "{TICKET-ID}" --json number,title,url,headRefName
+git branch -a | grep -i "{issue-id}"
+gh pr list --search "{ISSUE-ID}" --json number,title,url,headRefName
 ls issues/*{number}* specs/*{number}* 2>/dev/null
 ```
 
 If found: Report what exists, ask user to continue or start fresh.
 
-### Phase 2: Fetch the Linear Ticket
+### Phase 2: Fetch the Linear Issue
 
 Use Linear MCP:
 ```
-linear_get_issue(id: "{TICKET-ID}")
+linear_get_issue(id: "{ISSUE-ID}")
 ```
 
 Extract: title, description, state, assignee, project, labels.
@@ -47,9 +47,9 @@ Extract: title, description, state, assignee, project, labels.
 
 **CRITICAL**: `issues/` files are PRODUCT documentation (WHAT & WHY), not technical.
 
-Create/update `issues/{TICKET-ID}.md`:
+Create/update `issues/{ISSUE-ID}.md`:
 ```markdown
-# {TICKET-ID}: {Title}
+# {ISSUE-ID}: {Title}
 
 ## Summary
 {2-3 sentence business description}
@@ -65,7 +65,7 @@ Create/update `issues/{TICKET-ID}.md`:
 - {Rule 1}
 
 ## Out of Scope
-- {What this ticket does NOT include}
+- {What this issue does NOT include}
 ```
 
 **DO NOT include**: File paths, code snippets, architecture details.
@@ -82,11 +82,11 @@ Create/update `issues/{TICKET-ID}.md`:
 
 **CRITICAL**: `specs/` files are TECHNICAL documentation (HOW).
 
-Create/overwrite `specs/{ticket-id-lowercase}.md`:
+Create/overwrite `specs/{issue-id-lowercase}.md`:
 ```markdown
-# {TICKET-ID}: {Title} - Technical Spec
+# {ISSUE-ID}: {Title} - Technical Spec
 
-> See [{TICKET-ID}](../issues/{TICKET-ID}.md) for product requirements.
+> See [{ISSUE-ID}](../issues/{ISSUE-ID}.md) for product requirements.
 
 ## Architecture Overview
 {High-level approach and key decisions}
@@ -126,15 +126,15 @@ Summarize with:
 ## Output Format
 
 ```
-## {TICKET-ID}: {Title}
+## {ISSUE-ID}: {Title}
 
-**Status**: {New ticket / Existing branch found / PR already open}
+**Status**: {New issue / Existing branch found / PR already open}
 
 **Summary**: Brief description of what this feature accomplishes.
 
 **Files saved**:
-- `issues/{TICKET-ID}.md` - Product requirements
-- `specs/{ticket-id}.md` - Technical specification
+- `issues/{ISSUE-ID}.md` - Product requirements
+- `specs/{issue-id}.md` - Technical specification
 
 **Implementation Plan**:
 1. {First task}
@@ -152,5 +152,5 @@ Would you like me to proceed with this plan?
 ## Error Handling
 
 - **Linear MCP not available**: Report error, ask user to configure `.mcp.json`
-- **Ticket not found**: Inform user, suggest checking the ticket ID
+- **Issue not found**: Inform user, suggest checking the issue ID
 - **Existing work conflicts**: Present options to user

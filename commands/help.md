@@ -29,31 +29,22 @@ If an update is available, show the notice BEFORE the command list.
 Output the following:
 
 ```
-═══════════════════════════════════════════════════════════════════════════
-                           MAIN WORKFLOW
-═══════════════════════════════════════════════════════════════════════════
+MAIN WORKFLOW
+─────────────
+/forge:issues  →  (code)  →  /forge:finish  →  (merge)  →  /forge:cleanup
 
-  1. /forge:issues    Pick a ticket or create one → opens new worktree + tmux
-  2. (you code...)
-  3. /forge:finish    Push, PR ready, CodeRabbit review, auto-fix
-  4. (PR merged...)
-  5. /forge:cleanup   Remove worktree, delete branches, close tmux
+That's it. 3 commands.
 
-That's it. Most of the time you only need these 3 commands.
 
-═══════════════════════════════════════════════════════════════════════════
-                         UTILITY COMMANDS
-═══════════════════════════════════════════════════════════════════════════
+UTILITIES (not part of main workflow)
+─────────────────────────────────────
+/forge:new-issue <desc>   Create issue from description (skip browsing)
+/forge:capture            Turn this chat into an issue
+/forge:load <id>          Load issue into current session
+/forge:worktree           Create worktree for existing branch
+/forge:pr                 Open PR in browser
+/forge:audit              Dry-run of /forge:finish
+/forge:fix-pr             Re-run CodeRabbit fix loop
 
-These are for specific situations, not the main workflow:
-
-/forge:new-issue <desc>   Quick: create ticket from description, skip browsing
-/forge:ticketify          After planning chat, turn discussion into a ticket
-/forge:ticket <id>        Load a ticket into current session (no new worktree)
-/forge:worktree           Create worktree for existing branch (no new ticket)
-/forge:pr                 Open PR page in browser
-/forge:audit              Preview what /forge:finish will find (read-only)
-/forge:fix-pr             Manually trigger CodeRabbit fix loop
-
-/forge:help               Show this message
+/forge:help               This message
 ```
