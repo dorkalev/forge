@@ -13,7 +13,7 @@ Before showing help, check if there's a newer version:
 REMOTE_VERSION=$(curl -s https://raw.githubusercontent.com/dorkalev/forge/main/.claude-plugin/plugin.json | grep '"version"' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
 
 # Get local version (from plugin installation path or default)
-LOCAL_VERSION="1.7.0"
+LOCAL_VERSION="1.8.0"
 
 if [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ]; then
   echo "⚠️  UPDATE AVAILABLE: forge $REMOTE_VERSION (you have $LOCAL_VERSION)"
@@ -45,6 +45,7 @@ UTILITIES (not part of main workflow)
 /forge:pr                 Open PR in browser
 /forge:audit              Dry-run of /forge:finish
 /forge:fix-pr             Re-run CodeRabbit fix loop
+/forge:add-tests          Generate unit/integration tests
 /forge:tmux-list          List tmux sessions and attach in iTerm
 /forge:setup              Install dev tools (iTerm, tmux, Marta, etc.)
 
