@@ -4,7 +4,29 @@ description: List all available commands
 
 # /help - Available Commands
 
-Output the following command reference:
+## Check for Updates First
+
+Before showing help, check if there's a newer version:
+
+```bash
+# Get remote version from GitHub
+REMOTE_VERSION=$(curl -s https://raw.githubusercontent.com/dorkalev/forge/main/.claude-plugin/plugin.json | grep '"version"' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
+
+# Get local version (from plugin installation path or default)
+LOCAL_VERSION="1.0.0"  # Will be replaced by actual check when Claude Code provides this
+
+if [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ]; then
+  echo "⚠️  UPDATE AVAILABLE: forge $REMOTE_VERSION (you have $LOCAL_VERSION)"
+  echo "   Run: /plugin update forge@dorkalev/forge"
+  echo ""
+fi
+```
+
+If an update is available, show the notice BEFORE the command list.
+
+## Command Reference
+
+Output the following:
 
 ```
 Available Commands:
