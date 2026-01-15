@@ -1,5 +1,5 @@
 ---
-description: Create a new Linear ticket from a description and set up the full dev environment
+description: Create a new Linear issue from a description and set up the full dev environment
 ---
 
 # /new-issue - Quick Issue Creation
@@ -22,7 +22,7 @@ Create a new Linear issue and instantly set up the full development environment 
 - Create the worktree where ALL planning/implementation will happen
 - Hand off to the NEW Claude session in the new worktree
 
-**Remember:** This skill's ONLY job is to create the ticket + dev environment. The NEW Claude instance in the worktree will do all planning and implementation via `/forge:ticket`.
+**Remember:** This skill's ONLY job is to create the issue + dev environment. The NEW Claude instance in the worktree will do all planning and implementation via `/forge:load`.
 
 ## Usage
 
@@ -65,7 +65,7 @@ Do a BRIEF (< 2 minute) research:
 2. Identify key files that would be affected
 3. Expand description into: Summary, Requirements (bullets), Acceptance Criteria (checkboxes)
 
-**IMPORTANT:** This is NOT deep planning. Just enough context to create a good ticket. The real planning happens in the new worktree via `/forge:ticket`.
+**IMPORTANT:** This is NOT deep planning. Just enough context to create a good issue. The real planning happens in the new worktree via `/forge:load`.
 
 Then create the issue with the improved content.
 
@@ -118,10 +118,10 @@ gh pr create \
   --draft \
   --base staging \
   --title "${IDENTIFIER}: ${TITLE}" \
-  --body "## Linear Ticket
+  --body "## Linear Issue
 
-| Ticket | Title |
-|--------|-------|
+| Issue | Title |
+|-------|-------|
 | [${IDENTIFIER}](${URL}) | ${TITLE} |
 
 ## Description
@@ -153,7 +153,7 @@ tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
 tmux rename-window -t "${SESSION_NAME}" "${IDENTIFIER}"
 tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/ticket ${IDENTIFIER}" Enter
+tmux send-keys -t "${SESSION_NAME}" "/load ${IDENTIFIER}" Enter
 
 osascript -e "
 tell application \"iTerm\"
@@ -177,7 +177,7 @@ end tell
 **PR:** {PR_URL}
 **Worktree:** {WORKTREE_PATH}
 
-Claude is now running with `/ticket {IDENTIFIER}` in the new worktree.
+Claude is now running with `/load {IDENTIFIER}` in the new worktree.
 ```
 
 ## Error Handling
@@ -192,8 +192,8 @@ If the user starts discussing implementation details, planning, or asks to "plan
 
 1. Acknowledge their input briefly
 2. Capture any important details they mentioned for the issue description
-3. Remind them: "Let me finish setting up the worktree first - the NEW Claude session there will do the full planning via `/forge:ticket`"
+3. Remind them: "Let me finish setting up the worktree first - the NEW Claude session there will do the full planning via `/forge:load`"
 4. Continue with the remaining steps
 
 **Example response:**
-> "Great context! I'll include that in the issue. Let me finish creating the worktree, then the Claude instance there will dive deep into planning with `/forge:ticket`."
+> "Great context! I'll include that in the issue. Let me finish creating the worktree, then the Claude instance there will dive deep into planning with `/forge:load`."

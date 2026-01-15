@@ -88,7 +88,7 @@ tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
 tmux rename-window -t "${SESSION_NAME}" "${ISSUE_ID}"
 tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/ticket ${ISSUE_ID}" Enter
+tmux send-keys -t "${SESSION_NAME}" "/load ${ISSUE_ID}" Enter
 
 # Open new iTerm window and attach to the tmux session
 osascript -e "
@@ -113,7 +113,7 @@ This opens a fresh iTerm window attached to the tmux session where Claude is alr
 **Path:** {WORKTREE_PATH}
 **Tmux Session:** {SESSION_NAME}
 
-Ready to work! Claude is running with `/ticket {ISSUE_ID}`.
+Ready to work! Claude is running with `/load {ISSUE_ID}`.
 ```
 
 ## Error Handling

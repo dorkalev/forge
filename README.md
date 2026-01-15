@@ -32,15 +32,15 @@ Example `.mcp.json`:
 
 | Command | Description |
 |---------|-------------|
-| `/forge:issues` | Browse your assigned Linear issues or create a new one |
-| `/forge:new-issue <desc>` | Create a new Linear ticket and set up full dev environment |
-| `/forge:ticketify` | Turn your planning discussion into a Linear ticket |
+| `/forge:start` | Browse your assigned Linear issues or create a new one |
+| `/forge:new-issue <desc>` | Create a new Linear issue and set up full dev environment |
+| `/forge:capture` | Turn your planning discussion into a Linear issue |
 
 ### Development
 
 | Command | Description |
 |---------|-------------|
-| `/forge:ticket <id>` | Fetch a Linear ticket, save requirements, create technical plan |
+| `/forge:load <id>` | Fetch a Linear issue, save requirements, create technical plan |
 | `/forge:worktree` | Create a git worktree for an existing branch |
 | `/forge:pr` | Open the GitHub PR page for the current branch in browser |
 
