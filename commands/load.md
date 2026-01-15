@@ -41,16 +41,20 @@ Call `ProcessIssue({ISSUE-ID}, isRoot=true)`:
 ProcessIssue(issueId, isRoot):
     1. Fetch issue from Linear:
        linear_get_issue(id: issueId)
-       Extract: title, description, state, assignee, project, labels, children
+       Extract: title, description, state, assignee, project, labels
 
-    2. If issue has children:
+    2. Check for child issues:
+       linear_list_issues(parentId: issueId)
+       NOTE: get_issue does NOT return children - you MUST query list_issues with parentId
+
+    3. If issue has children:
        - List all children to user
        - For each child in order:
            ProcessIssue(childId, isRoot=false)  // recurse
        - After all children done, create parent summary files (see below)
        - Return
 
-    3. Draft product requirements (issues/{ISSUE-ID}.md):
+    4. Draft product requirements (issues/{ISSUE-ID}.md):
        ```markdown
        # {ISSUE-ID}: {Title}
 
@@ -72,19 +76,19 @@ ProcessIssue(issueId, isRoot):
        ```
        DO NOT include: File paths, code snippets, architecture details.
 
-    4. Show product requirements to user:
+    5. Show product requirements to user:
        - Display the drafted issue file content
        - Ask: "Does this capture the product requirements for {ISSUE-ID}? (approve / modify / skip)"
        - Wait for approval; if modify, update and show again
        - If skip, return (no spec created)
 
-    5. Research codebase:
+    6. Research codebase:
        - Analyze relevant code that will be affected
        - Identify existing patterns and utilities
        - Look for similar implementations as references
        - Check for potential conflicts or dependencies
 
-    6. Draft technical spec (specs/{issue-id-lowercase}.md):
+    7. Draft technical spec (specs/{issue-id-lowercase}.md):
        ```markdown
        # {ISSUE-ID}: {Title} - Technical Spec
 
@@ -116,17 +120,17 @@ ProcessIssue(issueId, isRoot):
        - [ ] {Question 1}
        ```
 
-    7. Show technical spec to user:
+    8. Show technical spec to user:
        - Display the drafted spec file content
        - Ask: "Does this implementation plan for {ISSUE-ID} look correct? (approve / modify)"
        - Wait for approval; if modify, update and show again
 
-    8. Update Linear (non-root issues only):
+    9. Update Linear (non-root issues only):
        - If NOT isRoot:
            linear_update_issue(issueId, description: "{content from issues file}")
        - Root/parent issues are NOT updated in Linear
 
-    9. Report:
+    10. Report:
        ✓ {ISSUE-ID}: {Title} - approved{", Linear updated" if not isRoot}
 ```
 
