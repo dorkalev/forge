@@ -13,7 +13,7 @@ Before showing help, check if there's a newer version:
 REMOTE_VERSION=$(curl -s https://raw.githubusercontent.com/dorkalev/forge/main/.claude-plugin/plugin.json | grep '"version"' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
 
 # Get local version (from plugin installation path or default)
-LOCAL_VERSION="1.0.0"  # Will be replaced by actual check when Claude Code provides this
+LOCAL_VERSION="1.2.0"
 
 if [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ]; then
   echo "⚠️  UPDATE AVAILABLE: forge $REMOTE_VERSION (you have $LOCAL_VERSION)"
@@ -29,45 +29,31 @@ If an update is available, show the notice BEFORE the command list.
 Output the following:
 
 ```
-Available Commands:
+═══════════════════════════════════════════════════════════════════════════
+                           MAIN WORKFLOW
+═══════════════════════════════════════════════════════════════════════════
 
--- Planning --------------------------------------------------------------
+  1. /forge:issues    Pick a ticket or create one → opens new worktree + tmux
+  2. (you code...)
+  3. /forge:finish    Push, PR ready, CodeRabbit review, auto-fix
+  4. (PR merged...)
+  5. /forge:cleanup   Remove worktree, delete branches, close tmux
 
-/forge:issues           Browse your assigned Linear issues or create a new one.
-                        Interactive workflow for issue management.
+That's it. Most of the time you only need these 3 commands.
 
-/forge:new-issue <desc> Create a new Linear ticket from a description and
-                        set up the full dev environment (branch, PR, worktree).
+═══════════════════════════════════════════════════════════════════════════
+                         UTILITY COMMANDS
+═══════════════════════════════════════════════════════════════════════════
 
-/forge:ticketify        Turn your planning discussion into a Linear ticket.
-                        Extracts requirements from chat and creates issue + spec files.
+These are for specific situations, not the main workflow:
 
--- Development -----------------------------------------------------------
+/forge:new-issue <desc>   Quick: create ticket from description, skip browsing
+/forge:ticketify          After planning chat, turn discussion into a ticket
+/forge:ticket <id>        Load a ticket into current session (no new worktree)
+/forge:worktree           Create worktree for existing branch (no new ticket)
+/forge:pr                 Open PR page in browser
+/forge:audit              Preview what /forge:finish will find (read-only)
+/forge:fix-pr             Manually trigger CodeRabbit fix loop
 
-/forge:ticket <id>      Start working on a Linear ticket. Fetches the issue,
-                        saves requirements, and creates a technical plan.
-
-/forge:worktree         Create a git worktree for an existing branch.
-
-/forge:pr               Open the GitHub PR page for the current branch in browser.
-
--- Review ----------------------------------------------------------------
-
-/forge:audit            Check SOC2 compliance status (read-only). Shows what
-                        /forge:finish will find without making any changes.
-
-/forge:finish           Finalize your work before pushing. Runs cleanup, tests,
-                        CodeRabbit review, and ensures everything is ready to merge.
-
-/forge:fix-pr           Auto-fix CodeRabbit review comments. Loops through
-                        findings and fixes them one by one until the PR is clean.
-
--- Completion ------------------------------------------------------------
-
-/forge:cleanup          Clean up after a PR is merged. Removes worktree, deletes
-                        branches, and kills the tmux session.
-
--- Help ------------------------------------------------------------------
-
-/forge:help             Show this help message.
+/forge:help               Show this message
 ```
