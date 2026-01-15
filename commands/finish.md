@@ -60,9 +60,9 @@ TodoWrite([
   { content: "Phase 4: Issue & Spec File Management", status: "pending" },
   { content: "Phase 5: Commit Changes", status: "pending" },
   { content: "Phase 6: Test Generation", status: "pending" },
-  { content: "Phase 7: CodeRabbit Review", status: "pending" },
+  { content: "Phase 7: Code Review", status: "pending" },
   { content: "Phase 8: Final Push & PR Ready", status: "pending" },
-  { content: "Phase 9: Invoke /forge:fix-pr", status: "pending" }
+  { content: "Phase 9: Fix Review Findings", status: "pending" }
 ])
 ```
 
@@ -191,16 +191,29 @@ This will:
 - Run and verify all tests pass
 - Commit the tests
 
-### Phase 7: CodeRabbit Review
+### Phase 7: Code Review
 
-1. Run `scripts/coderabbit-review.sh`
-2. If CLI fails, trigger via PR comment: `@coderabbitai review`
-3. Fix Critical/High issues, document skipped Low issues
-4. Re-run tests after fixes
-5. Commit fixes:
+Invoke `/code-review` (from the official Anthropic code-review plugin) to review the PR.
+
+**Prerequisites**: Install the plugin first:
+```
+/plugin add anthropics/claude-plugins-official/plugins/code-review
+```
+
+The review will:
+1. Run 5 parallel agents checking bugs, CLAUDE.md compliance, git history, etc.
+2. Score each issue for confidence (0-100)
+3. Only surface issues scoring 80+ to reduce false positives
+4. Post findings as PR comment
+
+If issues are found:
+1. Fix the high-confidence issues
+2. Re-run tests
+3. Commit fixes:
    ```
-   fix: address CodeRabbit review findings
+   fix: address code review findings
    ```
+4. Push and re-run `/code-review` to verify
 
 ### Phase 8: Final Push & PR Ready
 
@@ -232,20 +245,20 @@ This will:
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
 
-### Phase 9: Invoke /forge:fix-pr
+### Phase 9: Fix Review Findings
 
-After completing all phases above, **automatically invoke `/forge:fix-pr`** to:
-1. Wait for CodeRabbit to review the now-ready PR
-2. Continuously fix any Major/Critical findings
-3. Loop until no more issues or user stops
-
-This ensures the PR is not just ready but also passes CodeRabbit review.
+If `/code-review` found issues:
+1. Read the PR comment with findings
+2. Fix each high-confidence issue
+3. Commit: `fix: address code review findings`
+4. Push and re-run `/code-review`
+5. Repeat until no issues found
 
 ## Quality Gates
 
 Do NOT proceed to push if:
 - Tests fail
-- CodeRabbit has unresolved critical issues
+- Code review has unresolved high-confidence issues
 - Unspeced features remain unaddressed
 - Spec file not aligned with implementation
 
