@@ -172,6 +172,9 @@ All tools installed successfully.
 - Sign in to Linear and Slack
 - Consider installing Warp for an AI-enhanced terminal: `brew install --cask warp`
 
+**Recommended Claude Code plugins:**
+- Code review: `/plugin add anthropics/claude-plugins-official/plugins/code-review`
+
 Run `/forge:start` to begin working on an issue.
 ```
 
