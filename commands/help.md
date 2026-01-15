@@ -13,7 +13,7 @@ Before showing help, check if there's a newer version:
 REMOTE_VERSION=$(curl -s https://raw.githubusercontent.com/dorkalev/forge/main/.claude-plugin/plugin.json | grep '"version"' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
 
 # Get local version (from plugin installation path or default)
-LOCAL_VERSION="1.5.0"
+LOCAL_VERSION="1.6.0"
 
 if [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ]; then
   echo "⚠️  UPDATE AVAILABLE: forge $REMOTE_VERSION (you have $LOCAL_VERSION)"
