@@ -23,15 +23,50 @@ Run this when you're ready to finalize your work before pushing.
 ### FORBIDDEN Git Operations:
 - `git stash` / `git stash drop` / `git stash pop`
 - `git checkout -- <file>` / `git checkout .`
-- `git reset --hard`
-- `git clean -fd`
+- `git reset --hard` / `git reset HEAD~`
+- `git clean -fd` / `git clean -f`
 - `git restore --staged --worktree`
+- `git revert` without explicit user approval
+- `rm` on any file the user created (only remove files YOU created during this session)
 
 ### Safe Alternatives:
-- **Merge conflicts**: Ask user to resolve manually
-- **Files need reverting**: Ask user to handle manually
+- **Merge conflicts**: STOP and ask user to resolve manually
+- **Files need reverting**: STOP and ask user to handle manually
 - **Messy branch**: Work with what exists, commit incrementally
 - **Need clean state**: Ask user to commit first
+- **Want to remove user's file**: Ask user for explicit approval first
+
+### Cleanup Rules (Phase 2):
+The cleanup phase may ONLY:
+- Remove files that are clearly temporary (*.pyc, __pycache__, .DS_Store, *.log)
+- Remove files listed in .gitignore that were accidentally tracked
+- Run formatters/linters that auto-fix (but NEVER delete code)
+
+The cleanup phase must NEVER:
+- Delete source code files
+- Remove tests
+- Delete configuration files
+- Remove anything that looks intentional
+
+## REQUIRED: Progress Visibility
+
+**Use TodoWrite at the START of execution to show all phases:**
+
+```
+TodoWrite([
+  { content: "Phase 1: Discovery & Analysis", status: "pending" },
+  { content: "Phase 2: Cleanup & Consolidation", status: "pending" },
+  { content: "Phase 3: Spec Alignment Verification", status: "pending" },
+  { content: "Phase 4: Issue & Spec File Management", status: "pending" },
+  { content: "Phase 5: Commit Changes", status: "pending" },
+  { content: "Phase 6: Test Generation", status: "pending" },
+  { content: "Phase 7: CodeRabbit Review", status: "pending" },
+  { content: "Phase 8: Final Push & PR Ready", status: "pending" },
+  { content: "Phase 9: Invoke /forge:fix-pr", status: "pending" }
+])
+```
+
+**Update status as you progress** - mark each phase `in_progress` when starting, `completed` when done. This gives the user visibility into where you are in the workflow.
 
 ## Core Mission
 
@@ -62,11 +97,20 @@ Execute a comprehensive pre-push compliance workflow:
 1. Get current branch name
 2. Locate issue file in `issues/` directory
 3. Parse product requirements
-4. Analyze ALL code changes since `staging`:
+4. Analyze ALL code changes since `staging` - **both committed AND uncommitted**:
    ```bash
+   # Committed changes (what's in commits since staging)
    git log staging..HEAD --oneline
    git diff staging...HEAD --stat
+
+   # Uncommitted changes (working directory)
+   git status --short
+   git diff --stat  # unstaged
+   git diff --cached --stat  # staged
    ```
+5. **IMPORTANT**: The spec alignment (Phase 3) must verify BOTH:
+   - All committed changes since staging have corresponding specs
+   - All uncommitted changes are also covered
 
 ### Phase 2: Cleanup & Consolidation
 
@@ -77,8 +121,14 @@ Execute a comprehensive pre-push compliance workflow:
 
 ### Phase 3: Spec Alignment Verification
 
-1. Extract implemented features from `git diff staging...HEAD`
-2. Compare against `issues/` file
+1. Extract implemented features from **ALL changes since staging**:
+   ```bash
+   # Full diff including both committed AND uncommitted
+   git diff staging...HEAD   # committed
+   git diff                  # uncommitted (unstaged)
+   git diff --cached         # uncommitted (staged)
+   ```
+2. For EACH significant change, verify it's covered in `issues/` or `specs/`
 3. Categorize: **Speced** vs **Unspeced**
 
 For UNSPECED features, ask user:
@@ -151,7 +201,7 @@ Do NOT push yet.
    fix: address CodeRabbit review findings
    ```
 
-### Phase 8: Final Push & PR Linking
+### Phase 8: Final Push & PR Ready
 
 1. Verify tests pass
 2. Push to remote:
@@ -161,20 +211,34 @@ Do NOT push yet.
 
 3. Find existing PR:
    ```bash
-   gh pr list --head <branch-name> --base staging --json number,url
+   gh pr list --head <branch-name> --base staging --json number,url,isDraft
    ```
 
-4. Update PR description with Linear ticket table
+4. **Convert PR from draft to ready for review**:
+   ```bash
+   gh pr ready <pr-number>
+   ```
 
-5. Add PR link to Linear ticket:
+5. Update PR description with Linear ticket table
+
+6. Add PR link to Linear ticket:
    ```
    linear_add_comment(issueId: "<id>", body: "PR: <url>")
    ```
 
-6. Update Linear ticket state to "In Review":
+7. Update Linear ticket state to "In Review":
    ```
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
+
+### Phase 9: Invoke /forge:fix-pr
+
+After completing all phases above, **automatically invoke `/forge:fix-pr`** to:
+1. Wait for CodeRabbit to review the now-ready PR
+2. Continuously fix any Major/Critical findings
+3. Loop until no more issues or user stops
+
+This ensures the PR is not just ready but also passes CodeRabbit review.
 
 ## Quality Gates
 
@@ -186,12 +250,15 @@ Do NOT proceed to push if:
 
 ## Output Summary
 
-Report at completion:
+Report at completion of Phase 8 (before fix-pr):
 - Files changed/removed
-- Features verified against spec
+- Features verified against spec (both committed and uncommitted)
 - Tests added
-- CodeRabbit issues resolved
+- PR converted from draft to ready
+- Linear ticket updated to "In Review"
 - Linear/GitHub links created
+
+Then `/forge:fix-pr` takes over for continuous CodeRabbit fixing.
 
 ## Error Handling
 
