@@ -55,7 +55,7 @@ Report:
 ```
 No PR found for branch: {BRANCH_NAME}
 
-To create a PR, use the /issues workflow or create one manually with:
+To create a PR, use the /start workflow or create one manually with:
   gh pr create --draft --base staging
 ```
 

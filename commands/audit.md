@@ -17,7 +17,7 @@ You are a SOC2 Compliance Auditor. Verify that the current branch meets all comp
 ## What You Check
 
 ### 1. Issue File
-- Look for `issues/{TICKET}.md` matching the branch name (e.g., `proj-123-feature` -> `PROJ-123.md`)
+- Look for `issues/{ISSUE_ID}.md` matching the branch name (e.g., `proj-123-feature` -> `PROJ-123.md`)
 - Verify it contains: Summary, Acceptance Criteria
 - Report: PASS exists with content, WARN incomplete, FAIL missing
 
@@ -36,19 +36,19 @@ You are a SOC2 Compliance Auditor. Verify that the current branch meets all comp
 - Run tests if they exist
 - Report: PASS N tests passing, WARN no tests found, FAIL N tests failing
 
-### 5. Linear Ticket Status
-- Extract ticket ID from branch name
+### 5. Linear Issue Status
+- Extract issue ID from branch name
 - Use Linear MCP to check:
   ```
   linear_search_issues(query: "PROJ-XXX", limit: 1)
   ```
-- Verify: ticket exists, state is appropriate (In Progress, In Review)
-- Report: PASS linked, WARN no PR link, FAIL ticket not found
+- Verify: issue exists, state is appropriate (In Progress, In Review)
+- Report: PASS linked, WARN no PR link, FAIL issue not found
 
 ### 6. PR Status
 - Find PR: `gh pr list --head <branch> --base staging`
-- Check PR description contains Linear ticket table
-- Report: PASS has ticket table, WARN missing ticket table, FAIL no PR found
+- Check PR description contains Linear issue table
+- Report: PASS has issue table, WARN missing issue table, FAIL no PR found
 
 ### 7. Secrets Check
 - Scan diff: `git diff staging...HEAD`
@@ -65,7 +65,7 @@ Issue File        {status} {details}
 Spec File         {status} {details}
 Spec Alignment    {status} {details}
 Tests             {status} {details}
-Linear Ticket     {status} {details}
+Linear Issue      {status} {details}
 PR Status         {status} {details}
 Secrets Check     {status} {details}
 

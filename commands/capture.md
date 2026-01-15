@@ -47,9 +47,9 @@ Priority mapping: 0=None, 1=Urgent, 2=High, 3=Medium, 4=Low
 
 ### Phase 4: Save Product Requirements
 
-Create `issues/{TICKET}-{number}.md`:
+Create `issues/{ISSUE_ID}-{number}.md`:
 ```markdown
-# {TICKET}-{number}: {Title}
+# {ISSUE_ID}-{number}: {Title}
 
 **Priority:** {Priority}
 **State:** Backlog
@@ -78,9 +78,9 @@ Create `issues/{TICKET}-{number}.md`:
 
 Create `specs/{issue}-{number}-{feature-name}.md`:
 ```markdown
-# {TICKET}-{number}: {Title} - Technical Spec
+# {ISSUE_ID}-{number}: {Title} - Technical Spec
 
-> See [{TICKET}-{number}](../issues/{TICKET}-{number}.md) for product requirements.
+> See [{ISSUE_ID}-{number}](../issues/{ISSUE_ID}-{number}.md) for product requirements.
 
 ## Overview
 {High-level technical summary}
@@ -107,17 +107,17 @@ Create `specs/{issue}-{number}-{feature-name}.md`:
 ### Phase 6: Output Summary
 
 ```
-## Created: {TICKET}-{number}: {Title}
+## Created: {ISSUE_ID}-{number}: {Title}
 
 **Linear issue**: {issue_url}
 
 **Files saved**:
-- `issues/{TICKET}-{number}.md` - Product requirements
+- `issues/{ISSUE_ID}-{number}.md` - Product requirements
 - `specs/{issue}-{number}-{feature-name}.md` - Technical specification
 
 **Next steps**:
 - Create branch: `git checkout -b {issue}-{number}-{feature-name}`
-- Or use `/issues` to set up the full dev environment
+- Or use `/start` to set up the full dev environment
 
 Ready to implement!
 ```
