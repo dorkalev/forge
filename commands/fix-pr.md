@@ -1,16 +1,13 @@
 ---
-description: Fix code review + CodeRabbit findings in sequence
+description: Fix CodeRabbit findings from GitHub PR
 ---
 
-# /fix-pr - Auto-Fix Code Review Findings
+# /fix-pr - Fix CodeRabbit Findings
 
-You are an automated Code Review Fixer. Your mission is to fix findings sequentially:
-1. **First**: `/code-review` (Claude's multi-agent review)
-2. **Then**: CodeRabbit (GitHub bot, runs after push)
+You are an automated CodeRabbit Fixer. Your mission is to fetch CodeRabbit review comments from the GitHub PR and fix Major/Critical issues.
 
 **Prerequisites**:
-- `gh` CLI authenticated (`gh auth login`)
-- `/code-review` plugin: `/plugin add anthropics/claude-plugins-official/plugins/code-review`
+- GitHub API access (token in `.forge` file)
 - CodeRabbit enabled on repository (GitHub app)
 
 ## Usage
@@ -24,120 +21,90 @@ You are an automated Code Review Fixer. Your mission is to fix findings sequenti
 ### Phase 1: Setup
 
 1. Get current branch: `git branch --show-current`
-2. Find the PR:
+2. Find the PR using GitHub API:
    ```bash
-   gh pr list --head <branch> --base staging --json number,url,title,isDraft
+   curl -s -H "Authorization: token $GITHUB_TOKEN" \
+     "https://api.github.com/repos/{owner}/{repo}/pulls?head={owner}:{branch}&base=staging"
    ```
-3. If PR is draft, convert to ready:
-   ```bash
-   gh pr ready <pr-number>
-   ```
+3. Extract PR number and URL
 
----
+### Phase 2: Fetch CodeRabbit Comments
 
-## Part A: Claude /code-review Loop
-
-### Phase 2: Run /code-review
-
-Run `/code-review` to trigger Claude's multi-agent review.
-
-5 parallel agents check:
-- CLAUDE.md compliance
-- Obvious bugs in changes
-- Git history context
-- Previous PR comments
-- Code comment compliance
-
-Only issues scoring 80+ confidence are surfaced.
-
-### Phase 3: Fix /code-review Issues
-
-For each issue from `/code-review`:
-
-1. Read the linked file and line range
-2. Understand the problem
-3. Apply the fix
-4. Verify syntax
-
-### Phase 4: Commit, Push, Repeat
+Fetch all review comments from the PR:
 
 ```bash
-git add -A
-git commit -m "fix: address code review findings
+# Get inline review comments
+curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/{owner}/{repo}/pulls/{pr-number}/comments"
 
-- [list each fix]"
-git push
+# Get issue comments (main thread)
+curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/{owner}/{repo}/issues/{pr-number}/comments"
 ```
 
-Re-run `/code-review`. Repeat until "No issues found".
-
----
-
-## Part B: CodeRabbit Loop (after /code-review is clean)
-
-### Phase 5: Wait for CodeRabbit
-
-After `/code-review` passes, wait for CodeRabbit to review:
-
-```bash
-echo "Waiting 3 minutes for CodeRabbit to review..."
-sleep 180
-```
-
-### Phase 6: Fetch CodeRabbit Comments
-
-```bash
-gh api repos/{owner}/{repo}/pulls/{pr-number}/comments
-gh api repos/{owner}/{repo}/pulls/{pr-number}/reviews
-```
-
-Filter for `coderabbitai[bot]`.
+Filter for comments from `coderabbitai[bot]`.
 
 **Severity markers:**
-- **Critical**: `_Critical_` - MUST fix
-- **Major**: `_Major_` or `Potential issue` - MUST fix
+- **Critical**: `_Critical_` or `**Critical**` - MUST fix
+- **Major**: `_Major_` or `**Major**` or `Potential issue` - MUST fix
 - **Minor**: `_Minor_` - skip
 - **Trivial**: `_Trivial_` or `Nitpick` - skip
 
-If no Major/Critical issues, done!
+If no Major/Critical issues found, report success and exit.
 
-### Phase 7: Fix CodeRabbit Issues
+### Phase 3: Fix CodeRabbit Issues
 
 For each Major/Critical issue:
 
-1. Read the affected file
-2. Apply the fix
-3. Verify syntax
+1. Read the affected file at the specified line
+2. Understand the problem from CodeRabbit's description
+3. Apply the fix
+4. Verify syntax is correct
 
-**For design questions** ("confirm whether", "is this acceptable"):
+**For design questions** ("confirm whether", "is this acceptable", "consider whether"):
+Ask the user:
 ```
-Issue: {description}
+CodeRabbit asks: {description}
 File: {file}:{line}
 
-[A] Acknowledge (keep as-is)
-[F] Fix it
-[S] Skip
+Options:
+[A] Acknowledge (keep as-is, reply explaining why)
+[F] Fix it (apply the suggestion)
+[S] Skip (don't reply)
 ```
 
-### Phase 8: Commit and Reply
+### Phase 4: Commit and Push
 
 ```bash
 git add -A
 git commit -m "fix: address CodeRabbit findings
 
-- [list each fix]"
+- [list each fix applied]"
 git push
 ```
 
-Reply to each fixed comment:
+### Phase 5: Reply to Comments
+
+For each fixed issue, reply to the CodeRabbit comment:
+
 ```bash
-gh api repos/{owner}/{repo}/pulls/{pr-number}/comments/{commentId}/replies \
-  -f body="Fixed in commit {hash}"
+curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Content-Type: application/json" \
+  "https://api.github.com/repos/{owner}/{repo}/pulls/{pr-number}/comments/{commentId}/replies" \
+  -d '{"body": "Fixed in commit {hash}"}'
 ```
 
-### Phase 9: Wait and Repeat
+For acknowledged (kept as-is) issues, reply with the explanation.
 
-Wait 3 minutes, re-fetch CodeRabbit comments. Repeat until no Major/Critical remain.
+### Phase 6: Wait and Repeat
+
+Wait 2-3 minutes for CodeRabbit to re-review after push:
+
+```bash
+sleep 150
+```
+
+Re-fetch comments and check for new Major/Critical issues. Repeat until none remain.
 
 ---
 
@@ -146,61 +113,53 @@ Wait 3 minutes, re-fetch CodeRabbit comments. Repeat until no Major/Critical rem
 ```
 /fix-pr
    │
-   ├─► /code-review loop
-   │      └─► Fix issues → push → repeat until clean
+   ├─► Fetch CodeRabbit comments from GitHub PR
    │
-   └─► CodeRabbit loop (only after /code-review passes)
-          └─► Wait → fix Major/Critical → push → repeat until clean
+   ├─► Filter for Major/Critical severity
+   │
+   ├─► Fix each issue
+   │
+   ├─► Commit, push, reply to comments
+   │
+   └─► Wait for re-review, repeat if new issues
 ```
 
 ## Stopping
 
 The loop stops when:
-- Both `/code-review` and CodeRabbit report no issues
+- No Major/Critical CodeRabbit issues remain
 - User types "stop" or Ctrl+C
-- GitHub API errors
+- GitHub API errors after 3 retries
 
 ## Example Session
 
 ```
-Starting fix loop for PR #44
-
-=== Part A: /code-review ===
+Starting CodeRabbit fix loop for PR #44
 
 [Iteration 1]
-Running /code-review...
-Found 2 issues:
-  1. Missing error handling -> Added try/catch
-  2. Memory leak -> Added cleanup
+Fetching CodeRabbit comments...
+Found 4 comments (2 Major, 1 Critical, 1 Minor)
+
+Fixing Critical/Major issues:
+  1. [Critical] XSS vulnerability in innerHTML -> Using textContent
+  2. [Major] Missing null check -> Added optional chaining
+  3. [Major] Hardcoded timeout -> Made configurable
 
 Committed: abc1234
-Running /code-review again...
+Replied to 3 comments.
+Waiting for re-review...
 
 [Iteration 2]
-No issues found. /code-review complete!
+Fetching CodeRabbit comments...
+No new Major/Critical issues.
 
-=== Part B: CodeRabbit ===
-
-Waiting 3 minutes for CodeRabbit...
-
-[Iteration 1]
-Found 3 CodeRabbit comments (2 Major, 1 Minor)
-Fixing Major issues:
-  1. innerHTML XSS -> Replaced with DOM
-  2. SQL injection -> Parameterized
-
-Committed: def5678
-Waiting 3 minutes...
-
-[Iteration 2]
-No Major/Critical remaining.
-
-All reviews complete!
+CodeRabbit review complete!
 ```
 
 ## Error Handling
 
-- **API rate limit**: Wait and retry
-- **File not found**: Skip, report, continue
-- **Git conflict**: Stop, await instruction
+- **API rate limit**: Wait 60s and retry
+- **File not found**: Skip issue, report, continue
+- **Git conflict**: Stop, await user instruction
 - **Network error**: Retry 3x, then stop
+- **CodeRabbit still processing**: Wait additional 2 minutes
