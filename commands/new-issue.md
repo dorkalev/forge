@@ -73,11 +73,10 @@ Then create the issue with the improved content.
 
 ```bash
 cd "${WORKTREE_REPO_PATH}"
-git fetch origin
-git checkout staging && git pull origin staging
+git fetch origin staging
 
 BRANCH_NAME="${IDENTIFIER}-$(echo "${TITLE}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | head -c 50)"
-git checkout -b "${BRANCH_NAME}"
+git checkout -b "${BRANCH_NAME}" origin/staging
 ```
 
 ### Step 6: Create Issue File
@@ -108,7 +107,6 @@ Write to `issues/{IDENTIFIER}.md`:
 git add "issues/${IDENTIFIER}.md"
 git commit -m "Add issue file for ${IDENTIFIER}"
 git push -u origin "${BRANCH_NAME}"
-git checkout staging
 ```
 
 ### Step 8: Create Draft PR

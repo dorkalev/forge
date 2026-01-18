@@ -80,12 +80,11 @@ Use AskUserQuestion to get input:
 
 1. Generate branch name: `{identifier}-{slugified-title}` (max 50 chars)
 
-2. Create branch from staging:
+2. Create branch from latest origin/staging:
    ```bash
    cd "${WORKTREE_REPO_PATH}"
-   git fetch origin
-   git checkout staging && git pull origin staging
-   git checkout -b "${BRANCH_NAME}"
+   git fetch origin staging
+   git checkout -b "${BRANCH_NAME}" origin/staging
    ```
 
 3. **Optional**: Ask if user wants to expand the specification with AI.
@@ -115,7 +114,6 @@ Use AskUserQuestion to get input:
    git add "issues/${IDENTIFIER}.md"
    git commit -m "Add issue file for ${IDENTIFIER}"
    git push -u origin "${BRANCH_NAME}"
-   git checkout staging
    ```
 
 ### Step 5: Create Draft PR
