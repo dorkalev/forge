@@ -116,6 +116,7 @@ git checkout staging
 ```bash
 gh pr create \
   --draft \
+  --head "${BRANCH_NAME}" \
   --base staging \
   --title "${IDENTIFIER}: ${TITLE}" \
   --body "## Linear Issue

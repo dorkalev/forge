@@ -123,6 +123,7 @@ Use AskUserQuestion to get input:
 ```bash
 gh pr create \
   --draft \
+  --head "${BRANCH_NAME}" \
   --base staging \
   --title "${IDENTIFIER}: ${TITLE}" \
   --body "## Linear Issue
