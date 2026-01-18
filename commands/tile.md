@@ -33,44 +33,44 @@ tell application "iTerm"
 
     -- Calculate grid dimensions
     if windowCount = 1 then
-        set cols to 1
-        set rows to 1
+        set numCols to 1
+        set numRows to 1
     else if windowCount = 2 then
-        set cols to 2
-        set rows to 1
+        set numCols to 2
+        set numRows to 1
     else if windowCount <= 4 then
-        set cols to 2
-        set rows to 2
+        set numCols to 2
+        set numRows to 2
     else if windowCount <= 6 then
-        set cols to 3
-        set rows to 2
+        set numCols to 3
+        set numRows to 2
     else if windowCount <= 9 then
-        set cols to 3
-        set rows to 3
+        set numCols to 3
+        set numRows to 3
     else
-        set cols to 4
-        set rows to (windowCount + 3) div 4
+        set numCols to 4
+        set numRows to (windowCount + 3) div 4
     end if
 
     -- Calculate tile dimensions
-    set tileWidth to screenWidth / cols
-    set tileHeight to usableHeight / rows
+    set tileWidth to screenWidth / numCols
+    set tileHeight to usableHeight / numRows
 
     -- Position each window
     set windowIndex to 0
     repeat with w in windowList
-        set col to windowIndex mod cols
-        set row to windowIndex div cols
+        set colPos to windowIndex mod numCols
+        set rowPos to windowIndex div numCols
 
-        set x to col * tileWidth
-        set y to menuBarHeight + (row * tileHeight)
+        set x to colPos * tileWidth
+        set y to menuBarHeight + (rowPos * tileHeight)
 
         set bounds of w to {x, y, x + tileWidth, y + tileHeight}
 
         set windowIndex to windowIndex + 1
     end repeat
 
-    return "Tiled " & windowCount & " windows in " & cols & "x" & rows & " grid"
+    return "Tiled " & windowCount & " windows in " & numCols & "x" & numRows & " grid"
 end tell
 EOF
 ```
