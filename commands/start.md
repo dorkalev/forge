@@ -79,6 +79,8 @@ Use AskUserQuestion to get input:
 ### Step 4: Create Branch
 
 1. Generate branch name: `{identifier}-{slugified-title}` (max 50 chars)
+   - Example: `eng-123-fix-login-bug`
+   - **IMPORTANT**: Do NOT add any prefix like username, namespace, or folder structure. The branch name must start directly with the issue identifier.
 
 2. Create branch from latest origin/staging:
    ```bash
