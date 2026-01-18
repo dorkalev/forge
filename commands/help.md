@@ -167,6 +167,20 @@ Shows all active tmux sessions and lets you pick one:
   3. Opens iTerm and attaches to selected session
 ```
 
+### /forge:help tile
+
+```
+/forge:tile - Tile iTerm Windows
+
+Arranges all iTerm windows in an equal grid on screen:
+  - 1 window: Full screen
+  - 2 windows: Side by side
+  - 3-4 windows: 2x2 grid
+  - 5-6 windows: 3x2 grid
+  - 7-9 windows: 3x3 grid
+  - 10+ windows: 4xN grid
+```
+
 ### /forge:help about
 
 ```
@@ -199,6 +213,7 @@ UTILITIES (not part of main workflow)
 /forge:fix-pr             Fix code review + CodeRabbit findings
 /forge:add-tests          Generate unit/integration tests
 /forge:tmux-list          List tmux sessions and attach in iTerm
+/forge:tile               Tile all iTerm windows equally on screen
 /forge:setup              Install dev tools (iTerm, tmux, Marta, etc.)
 
 /forge:about              Learn how Forge makes SOC2 a superpower
