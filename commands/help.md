@@ -170,15 +170,15 @@ Shows all active tmux sessions and lets you pick one:
 ### /forge:help tile
 
 ```
-/forge:tile - Tile iTerm Windows
+/forge:tile - Tile Tmux Sessions in iTerm Panes
 
-Arranges all iTerm windows in an equal grid on screen:
-  - 1 window: Full screen
-  - 2 windows: Side by side
-  - 3-4 windows: 2x2 grid
-  - 5-6 windows: 3x2 grid
-  - 7-9 windows: 3x3 grid
-  - 10+ windows: 4xN grid
+Creates a single iTerm window with split panes for all tmux sessions:
+  1. Finds all tmux sessions
+  2. Creates one iTerm window
+  3. Splits into grid (2x1, 2x2, 3x2, etc.)
+  4. Attaches each pane to a tmux session
+
+Navigate: Cmd+[ / Cmd+]  |  Maximize: Cmd+Shift+Enter
 ```
 
 ### /forge:help about
@@ -213,7 +213,7 @@ UTILITIES (not part of main workflow)
 /forge:fix-pr             Fix code review + CodeRabbit findings
 /forge:add-tests          Generate unit/integration tests
 /forge:tmux-list          List tmux sessions and attach in iTerm
-/forge:tile               Tile all iTerm windows equally on screen
+/forge:tile               Tile tmux sessions into iTerm panes
 /forge:setup              Install dev tools (iTerm, tmux, Marta, etc.)
 
 /forge:about              Learn how Forge makes SOC2 a superpower
