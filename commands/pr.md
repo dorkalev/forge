@@ -51,16 +51,65 @@ Opened PR in browser: {PR_URL}
 ```
 
 **If no PR exists:**
+
+Ask with AskUserQuestion:
+- Header: "PR"
+- Question: "No PR found for this branch. Create one?"
+- Options:
+  - "Create draft PR" - Create as draft (recommended)
+  - "Create ready PR" - Create as ready for review
+  - "Skip" - Don't create, just report
+
+**If user chooses to create:**
+
+Extract issue ID from branch name (e.g., `ENG-123` from `dor/eng-123-fix-something`):
+```bash
+IDENTIFIER=$(echo "${BRANCH_NAME}" | grep -oE '[A-Z]+-[0-9]+' | head -1)
+```
+
+Get issue info from Linear (if identifier found):
+```bash
+# Use Linear MCP to get issue title and URL
+```
+
+Create the PR:
+```bash
+gh pr create \
+  --draft \  # or omit for ready PR
+  --head "${BRANCH_NAME}" \
+  --base staging \
+  --title "${IDENTIFIER}: ${ISSUE_TITLE}" \
+  --body "## Linear Issue
+
+| Issue | Title |
+|-------|-------|
+| [${IDENTIFIER}](${ISSUE_URL}) | ${ISSUE_TITLE} |
+
+## Description
+
+${ISSUE_DESCRIPTION}"
+```
+
+If no Linear issue found, create simple PR:
+```bash
+gh pr create \
+  --draft \
+  --head "${BRANCH_NAME}" \
+  --base staging \
+  --title "${BRANCH_NAME}"
+```
+
+Then open in browser:
+```bash
+gh pr view "${BRANCH_NAME}" --web
+```
+
 Report:
 ```
-No PR found for branch: {BRANCH_NAME}
-
-To create a PR, use the /start workflow or create one manually with:
-  gh pr create --draft --base staging
+Created and opened PR: {PR_URL}
 ```
 
 ## Error Handling
 
 - Not on feature branch: Report error
-- No PR found: Report that no PR exists (do not create one)
 - gh CLI not authenticated: Prompt user to run `gh auth login`
