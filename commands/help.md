@@ -208,7 +208,7 @@ UTILITIES (not part of main workflow)
 /forge:capture            Turn this chat into an issue
 /forge:load <id>          Fetch issue and create technical plan
 /forge:worktree           Create worktree for existing branch
-/forge:pr                 Open PR in browser
+/forge:pr                 Open PR in browser (or create if missing)
 /forge:audit              Dry-run of /forge:finish
 /forge:fix-pr             Fix code review + CodeRabbit findings
 /forge:add-tests          Generate unit/integration tests
