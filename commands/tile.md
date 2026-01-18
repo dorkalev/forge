@@ -2,93 +2,153 @@
 description: Tile all iTerm windows equally on screen
 ---
 
-# /tile - Tile iTerm Windows
+# /tile - Tile Tmux Sessions in iTerm Panes
 
-You are an automation assistant that helps developers organize their terminal windows.
+You are an automation assistant that helps developers organize their terminal sessions.
 
 ## Your Mission
 
-When the user runs `/tile`, execute this AppleScript to tile all iTerm windows equally on the screen:
+When the user runs `/tile`, consolidate all tmux sessions into a single iTerm window with split panes.
+
+### Step 1: Get Tmux Sessions
 
 ```bash
-osascript << 'EOF'
+tmux list-sessions -F "#{session_name}" 2>/dev/null
+```
+
+If no sessions exist, output:
+```
+No tmux sessions found.
+```
+And exit.
+
+### Step 2: Show Current State
+
+Display what will happen:
+
+```
+Found N tmux sessions:
+  - session1
+  - session2
+  - session3
+
+This will create a single iTerm window with N panes, each attached to a session.
+```
+
+### Step 3: Create Tiled Window
+
+Run this script, substituting the session names:
+
+```bash
+# Get all tmux sessions
+SESSIONS=($(tmux list-sessions -F "#{session_name}" 2>/dev/null))
+SESSION_COUNT=${#SESSIONS[@]}
+
+if [ "$SESSION_COUNT" -eq 0 ]; then
+    echo "No tmux sessions found."
+    exit 0
+fi
+
+# Build the AppleScript
+osascript << EOF
 tell application "iTerm"
-    set windowList to windows
-    set windowCount to count of windowList
+    activate
 
-    if windowCount = 0 then
-        return "No iTerm windows to tile"
-    end if
-
-    -- Get screen dimensions (main screen)
-    tell application "Finder"
-        set screenBounds to bounds of window of desktop
-        set screenWidth to item 3 of screenBounds
-        set screenHeight to item 4 of screenBounds
+    -- Create new window with first session
+    set newWindow to (create window with default profile)
+    tell current session of newWindow
+        write text "tmux attach -t ${SESSIONS[0]}"
     end tell
 
-    -- Account for menu bar (roughly 25 pixels)
-    set menuBarHeight to 25
-    set usableHeight to screenHeight - menuBarHeight
+    set sessionIndex to 1
+    set totalSessions to $SESSION_COUNT
 
-    -- Calculate grid dimensions
-    if windowCount = 1 then
+    -- Calculate grid: for 2 = 2x1, for 3-4 = 2x2, for 5-6 = 3x2, etc.
+    if totalSessions = 1 then
         set numCols to 1
         set numRows to 1
-    else if windowCount = 2 then
+    else if totalSessions = 2 then
         set numCols to 2
         set numRows to 1
-    else if windowCount <= 4 then
+    else if totalSessions ≤ 4 then
         set numCols to 2
         set numRows to 2
-    else if windowCount <= 6 then
+    else if totalSessions ≤ 6 then
         set numCols to 3
         set numRows to 2
-    else if windowCount <= 9 then
+    else if totalSessions ≤ 9 then
         set numCols to 3
         set numRows to 3
     else
         set numCols to 4
-        set numRows to (windowCount + 3) div 4
+        set numRows to (totalSessions + 3) div 4
     end if
 
-    -- Calculate tile dimensions
-    set tileWidth to screenWidth / numCols
-    set tileHeight to usableHeight / numRows
+    tell newWindow
+        tell current tab
+            -- First, create all columns by splitting vertically
+            repeat (numCols - 1) times
+                tell current session
+                    split vertically with default profile
+                end tell
+            end repeat
 
-    -- Position each window
-    set windowIndex to 0
-    repeat with w in windowList
-        set colPos to windowIndex mod numCols
-        set rowPos to windowIndex div numCols
+            -- Now split each column horizontally to create rows
+            set allSessions to sessions
+            repeat with colIndex from 1 to numCols
+                if numRows > 1 then
+                    set targetSession to item colIndex of allSessions
+                    tell targetSession
+                        repeat (numRows - 1) times
+                            split horizontally with default profile
+                        end repeat
+                    end tell
+                end if
+            end repeat
 
-        set x to colPos * tileWidth
-        set y to menuBarHeight + (rowPos * tileHeight)
+            -- Refresh sessions list after all splits
+            set allSessions to sessions
+            set sessionCount to count of allSessions
 
-        set bounds of w to {x, y, x + tileWidth, y + tileHeight}
+            -- Attach each pane to a tmux session
+            set tmuxSessions to {$(printf '"%s", ' "${SESSIONS[@]}" | sed 's/, $//')}
+            set tmuxCount to count of tmuxSessions
 
-        set windowIndex to windowIndex + 1
-    end repeat
+            repeat with i from 1 to sessionCount
+                if i ≤ tmuxCount then
+                    tell item i of allSessions
+                        write text "tmux attach -t " & item i of tmuxSessions
+                    end tell
+                end if
+            end repeat
+        end tell
+    end tell
 
-    return "Tiled " & windowCount & " windows in " & numCols & "x" & numRows & " grid"
+    return "Created window with " & totalSessions & " panes"
 end tell
 EOF
+
+echo "Tiled $SESSION_COUNT tmux sessions into iTerm panes"
 ```
 
-## Output Format
+### Step 4: Report Result
 
-Report the result:
+After execution, output:
 
 ```
-Tiled {N} iTerm windows in {cols}x{rows} grid
+Tiled {N} tmux sessions into iTerm panes:
+  - session1 (top-left)
+  - session2 (top-right)
+  - session3 (bottom-left)
+  - session4 (bottom-right)
 ```
 
 ## Grid Layout Reference
 
-| Windows | Layout |
-|---------|--------|
-| 1 | Full screen |
-| 2 | Side by side (2x1) |
+| Sessions | Layout |
+|----------|--------|
+| 1 | Full window |
+| 2 | Side by side (2 columns) |
 | 3-4 | 2x2 grid |
 | 5-6 | 3x2 grid |
 | 7-9 | 3x3 grid |
@@ -96,5 +156,13 @@ Tiled {N} iTerm windows in {cols}x{rows} grid
 
 ## Error Handling
 
-- If iTerm is not running: `iTerm is not running. Open iTerm first.`
-- If no windows exist: `No iTerm windows to tile.`
+- If tmux is not installed: `tmux is not installed. Install with: brew install tmux`
+- If no sessions exist: `No tmux sessions found. Start some with: tmux new -s <name>`
+- If iTerm is not running: Script will launch iTerm automatically
+
+## Notes
+
+- Old iTerm windows are NOT closed automatically (user may have unsaved work)
+- Each pane attaches to its tmux session (can detach with Ctrl+B, D)
+- Use Cmd+[ and Cmd+] to navigate between panes
+- Use Cmd+Shift+Enter to maximize/restore a pane
