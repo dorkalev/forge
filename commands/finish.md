@@ -119,33 +119,125 @@ Execute a comprehensive pre-push compliance workflow:
 3. Run linting/formatting
 4. Check for files that should be gitignored
 
-### Phase 3: Spec Alignment Verification
+### Phase 3: Spec Alignment Verification (CRITICAL)
 
-1. Extract implemented features from **ALL changes since staging**:
-   ```bash
-   # Full diff including both committed AND uncommitted
-   git diff staging...HEAD   # committed
-   git diff                  # uncommitted (unstaged)
-   git diff --cached         # uncommitted (staged)
-   ```
-2. For EACH significant change, verify it's covered in `issues/` or `specs/`
-3. Categorize: **Speced** vs **Unspeced**
+**Goal**: Ensure complete alignment between 4 sources of truth:
+1. **Linear ticket** - The authoritative product spec
+2. **`issues/` file** - Local copy of product requirements
+3. **`specs/` file** - Technical implementation plan
+4. **Actual diff** - What was actually implemented
 
-For UNSPECED features, ask user:
+#### Step 3.1: Gather All Sources
+
+```bash
+# Get actual implementation diff
+git diff staging...HEAD   # committed
+git diff                  # uncommitted (unstaged)
+git diff --cached         # uncommitted (staged)
 ```
-UNSPECED FEATURE DETECTED:
-Feature: [description]
+
+Read the issue file from `issues/{ISSUE_ID}.md`.
+Read the spec file from `specs/{feature-name}.md`.
+Fetch Linear ticket content using Linear MCP: `linear_get_issue(issueId: "<id>")`
+
+#### Step 3.2: Cross-Reference Analysis
+
+Create a misalignment report by comparing all 4 sources:
+
+```
+## Alignment Analysis
+
+### What Linear Says (Product Spec)
+- Requirement A: [from Linear description]
+- Requirement B: [from Linear description]
+- Acceptance Criteria: [list from Linear]
+
+### What issues/ File Says
+- [compare with Linear - note any drift]
+
+### What specs/ File Says
+- Technical approach: [summary]
+- Components touched: [list]
+
+### What Was Actually Implemented (Diff)
+- Files changed: [list]
+- Features added: [list]
+- Features modified: [list]
+
+### MISALIGNMENTS FOUND:
+
+| Type | Description | Source A | Source B | Action Needed |
+|------|-------------|----------|----------|---------------|
+| UNSPECED | Feature X implemented but not in any spec | Diff | - | Add to spec or remove |
+| DRIFT | Requirement Y in Linear but not in issues/ | Linear | issues/ | Sync files |
+| INCOMPLETE | Acceptance criterion Z not implemented | Linear | Diff | Implement or descope |
+| SCOPE_CREEP | Feature W added beyond requirements | Diff | Linear | Document or remove |
+```
+
+#### Step 3.3: Resolve Each Misalignment
+
+For each misalignment, ask user to choose resolution:
+
+**UNSPECED (implemented but not documented):**
+```
+UNSPECED FEATURE: [description]
+Found in: [files]
 
 Options:
-1. Add to current spec - Update the Linear issue
-2. Create new issue - Create separate Linear issue
+1. Add to current Linear issue - Update product spec
+2. Create new Linear issue - Separate ticket for SOC2 traceability
 3. Remove feature - Delete the unspeced code
 ```
 
-Execute choice using Linear MCP:
-- **Option 1**: `linear_update_issue(issueId, description: "<updated>")`
-- **Option 2**: `linear_create_issue(...)` then `linear_add_comment(issueId, "PR: <url>")`
-- **Option 3**: Remove the code
+**DRIFT (Linear ≠ issues/ file):**
+```
+SPEC DRIFT DETECTED:
+Linear says: [content]
+issues/ says: [content]
+
+Options:
+1. Sync issues/ FROM Linear (Linear is authoritative)
+2. Update Linear FROM issues/ (local changes are intentional)
+```
+
+**INCOMPLETE (spec'd but not implemented):**
+```
+INCOMPLETE IMPLEMENTATION:
+Requirement: [from Linear]
+Status: Not found in diff
+
+Options:
+1. Implement now - Add the missing functionality
+2. Descope - Remove from Linear issue (with comment explaining why)
+3. Defer - Create follow-up issue
+```
+
+**SCOPE_CREEP (implemented beyond spec):**
+```
+SCOPE CREEP DETECTED:
+Feature: [description]
+Not in: Linear, issues/, or specs/
+
+Options:
+1. Expand scope - Add to Linear issue
+2. New issue - Create separate ticket
+3. Remove - Delete the extra code
+```
+
+Execute choices using Linear MCP:
+- **Update issue**: `linear_update_issue(issueId, description: "<updated>")`
+- **Create issue**: `linear_create_issue(...)` then `linear_add_comment(issueId, "Related: <new-issue-url>")`
+- **Add comment**: `linear_add_comment(issueId, body: "<explanation>")`
+
+#### Step 3.4: Final Alignment Check
+
+After resolving all misalignments, verify:
+- [ ] Every change in diff maps to a Linear requirement
+- [ ] issues/ file matches Linear ticket
+- [ ] specs/ file describes the technical approach for all features
+- [ ] No undocumented code remains
+
+**Do NOT proceed to Phase 4 until alignment is confirmed.**
 
 ### Phase 4: Issue & Spec File Management
 

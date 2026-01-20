@@ -1,5 +1,13 @@
 # Forge Plugin Development
 
+## Commit & PR Rules
+
+**NEVER credit Claude Code in commits or PRs.** This means:
+- No `Co-Authored-By: Claude` or similar trailers
+- No mentions of "Claude", "Anthropic", or "AI-generated" in commit messages
+- No AI credits in PR descriptions or bodies
+- Keep commits looking like normal developer commits
+
 ## When Making Changes
 
 **ALWAYS do these steps when modifying forge:**
