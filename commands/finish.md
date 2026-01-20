@@ -59,6 +59,7 @@ TodoWrite([
   { content: "Phase 3: Spec Alignment Verification", status: "pending" },
   { content: "Phase 4: Issue & Spec File Management", status: "pending" },
   { content: "Phase 5: Commit Changes", status: "pending" },
+  { content: "Phase 5.5: Sync with Staging", status: "pending" },
   { content: "Phase 6: Test Generation", status: "pending" },
   { content: "Phase 7: Push & Code Review Loop", status: "pending" },
   { content: "Phase 8: PR Ready & Linear Sync", status: "pending" },
@@ -271,6 +272,49 @@ git commit -m "chore: cleanup and consolidation for [feature-name]"
 ```
 
 Do NOT push yet.
+
+### Phase 5.5: Sync with Staging
+
+**Goal**: Merge latest staging into branch AFTER local work is committed (safe).
+
+```bash
+git fetch origin staging
+git merge origin/staging --no-edit
+```
+
+#### If merge conflicts occur:
+
+1. List conflicted files:
+   ```bash
+   git diff --name-only --diff-filter=U
+   ```
+
+2. **Attempt to resolve each conflict automatically**:
+   - Read the conflicted file
+   - Analyze conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+   - Understand both sides:
+     - **OURS (HEAD)**: Your changes from this branch
+     - **THEIRS (origin/staging)**: Changes merged from staging
+   - Apply intelligent resolution:
+     - If both sides add different things: keep both
+     - If both modify same line: prefer OURS unless THEIRS is clearly a bug fix
+     - If THEIRS deletes something OURS modified: keep OURS
+   - Remove conflict markers and save
+
+3. After resolving all files:
+   ```bash
+   git add -A
+   git commit -m "merge: sync with staging"
+   ```
+
+4. **If a conflict is too complex** (e.g., large refactor on both sides):
+   - STOP and ask user to resolve manually
+   - Show the specific file and conflict
+   - Wait for user to confirm resolution before continuing
+
+#### If merge is clean:
+
+Continue to Phase 6.
 
 ### Phase 6: Test Generation
 
