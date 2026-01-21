@@ -165,9 +165,9 @@ linear_update_issue(issueId: "<id>", status: "In Progress")
 ```bash
 SESSION_NAME="${IDENTIFIER}"
 tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
-tmux send-keys -t "${SESSION_NAME}" "claude --chrome" Enter
+tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/load ${IDENTIFIER}" Enter
+tmux send-keys -t "${SESSION_NAME}" "/forge:load ${IDENTIFIER}" Enter
 
 osascript -e "
 tell application \"iTerm\"
@@ -190,7 +190,7 @@ end tell
 **Worktree:** {WORKTREE_PATH}
 **Tmux Session:** {SESSION_NAME}
 
-Claude is now running with `/load {IDENTIFIER}` in the new worktree.
+Claude is now running with `/forge:load {IDENTIFIER}` in the new worktree.
 ```
 
 ## Error Handling
