@@ -13,7 +13,7 @@ Before showing help, check if there's a newer version:
 REMOTE_VERSION=$(curl -s https://raw.githubusercontent.com/dorkalev/forge/main/.claude-plugin/plugin.json | grep '"version"' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
 
 # Get local version (from plugin installation path or default)
-LOCAL_VERSION="1.13.0"
+LOCAL_VERSION="1.20.0"
 
 if [ "$REMOTE_VERSION" != "$LOCAL_VERSION" ]; then
   echo "⚠️  UPDATE AVAILABLE: forge $REMOTE_VERSION (you have $LOCAL_VERSION)"
@@ -181,6 +181,75 @@ Creates a single iTerm window with split panes for all tmux sessions:
 Navigate: Cmd+[ / Cmd+]  |  Maximize: Cmd+Shift+Enter
 ```
 
+### /forge:help worktree
+
+```
+/forge:worktree <issue-id-or-branch> - Create Worktree for Existing Branch
+
+Creates a git worktree for an existing remote branch:
+  1. Finds branch by issue ID (e.g., PROJ-248) or exact name
+  2. Creates worktree in configured WORKTREE_BASE_PATH
+  3. Copies .env and .claude, symlinks .forge
+  4. Opens tmux session with Claude
+  5. Auto-runs /load if issue ID detected in branch name
+```
+
+### /forge:help pr
+
+```
+/forge:pr - Open Pull Request in Browser
+
+Opens or creates the PR for the current branch:
+  1. Gets current feature branch name
+  2. Checks if PR exists for this branch
+  3. If exists: opens in browser
+  4. If not: offers to create draft or ready PR
+  5. Auto-populates PR with Linear issue info if found
+```
+
+### /forge:help capture
+
+```
+/forge:capture - Turn Planning Discussion into Linear Issue
+
+Formalizes the current conversation into structured requirements:
+  1. Extracts feature name, requirements, and technical details
+  2. Prompts for priority and labels
+  3. Creates Linear issue
+  4. Saves issues/{ID}.md (product requirements)
+  5. Saves specs/{ID}-{name}.md (technical spec)
+```
+
+### /forge:help vscode
+
+```
+/forge:vscode - Open in VS Code
+
+Opens the current working directory in Visual Studio Code.
+```
+
+### /forge:help gemini
+
+```
+/forge:gemini - Open Gemini CLI Agent
+
+Opens Gemini CLI in a new iTerm2/tmux session:
+  1. Creates tmux session named gemini-{folder}
+  2. Launches gemini CLI in the session
+  3. Opens new iTerm window attached to the session
+```
+
+### /forge:help codex
+
+```
+/forge:codex - Open Codex CLI Agent
+
+Opens Codex CLI in a new iTerm2/tmux session:
+  1. Creates tmux session named codex-{folder}
+  2. Launches codex CLI in the session
+  3. Opens new iTerm window attached to the session
+```
+
 ### /forge:help about
 
 ```
@@ -214,6 +283,9 @@ UTILITIES (not part of main workflow)
 /forge:add-tests          Generate unit/integration tests
 /forge:tmux-list          List tmux sessions and attach in iTerm
 /forge:tile               Tile tmux sessions into iTerm panes
+/forge:vscode             Open current folder in VS Code
+/forge:gemini             Open Gemini CLI agent in tmux/iTerm
+/forge:codex              Open Codex CLI agent in tmux/iTerm
 /forge:setup              Install dev tools (iTerm, tmux, Marta, etc.)
 
 /forge:about              Learn how Forge makes SOC2 a superpower
