@@ -164,7 +164,13 @@ linear_update_issue(issueId: "<id>", status: "In Progress")
 
 ```bash
 SESSION_NAME="${IDENTIFIER}"
+FOLDER_NAME=$(basename "${WORKTREE_PATH}")
 tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
+
+# Configure status bar to show worktree folder name
+tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
+tmux set-option -t "${SESSION_NAME}" status-left-length 50
+
 tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3
 tmux send-keys -t "${SESSION_NAME}" "/forge:load ${IDENTIFIER}" Enter
