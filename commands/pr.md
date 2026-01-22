@@ -62,7 +62,7 @@ Ask with AskUserQuestion:
 
 **If user chooses to create:**
 
-Extract issue ID from branch name (e.g., `BOL-123` from `dor/bol-123-fix-something`):
+Extract issue ID from branch name (e.g., `BOL-123` from `bol-123-fix-something`):
 ```bash
 IDENTIFIER=$(echo "${BRANCH_NAME}" | grep -oE '[A-Z]+-[0-9]+' | head -1)
 ```

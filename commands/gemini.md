@@ -14,14 +14,14 @@ When the user runs `/gemini`:
 
 Use AskUserQuestion to verify access:
 - Header: "Gemini Access"
-- Question: "Do you have a Gemini paid plan? (Gal needs to open it personally per developer)"
+- Question: "Do you have a Gemini paid plan? (Admin needs to enable access per developer)"
 - Options:
   - "Yes, I have access"
   - "No, I need access"
 
 **If "No, I need access"**: Stop and output:
 ```
-You need a Gemini paid plan to use the CLI. Please contact Gal to get access enabled for your account.
+You need a Gemini paid plan to use the CLI. Please contact your admin to get access enabled for your account.
 ```
 
 **If "Yes, I have access"**: Continue to Step 2.
