@@ -148,7 +148,13 @@ cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || 
 
 ```bash
 SESSION_NAME="${BRANCH_NAME}"
+FOLDER_NAME=$(basename "${WORKTREE_PATH}")
 tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
+
+# Configure status bar to show worktree folder name
+tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
+tmux set-option -t "${SESSION_NAME}" status-left-length 50
+
 tmux rename-window -t "${SESSION_NAME}" "${IDENTIFIER}"
 tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3

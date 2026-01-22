@@ -18,7 +18,13 @@ SESSION_NAME="codex-$(basename "${CURRENT_DIR}")"
 tmux kill-session -t "${SESSION_NAME}" 2>/dev/null || true
 
 # Create new tmux session
+FOLDER_NAME=$(basename "${CURRENT_DIR}")
 tmux new-session -d -s "${SESSION_NAME}" -c "${CURRENT_DIR}"
+
+# Configure status bar to show folder name
+tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
+tmux set-option -t "${SESSION_NAME}" status-left-length 50
+
 tmux send-keys -t "${SESSION_NAME}" "codex" Enter
 
 # Open iTerm and attach
