@@ -82,9 +82,15 @@ ISSUE_ID=$(echo "${BRANCH_NAME}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]'
 If issue ID found:
 ```bash
 SESSION_NAME="${BRANCH_NAME}"
+FOLDER_NAME=$(basename "${WORKTREE_PATH}")
 
 # Create tmux session in background
 tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
+
+# Configure status bar to show worktree folder name
+tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
+tmux set-option -t "${SESSION_NAME}" status-left-length 50
+
 tmux rename-window -t "${SESSION_NAME}" "${ISSUE_ID}"
 tmux send-keys -t "${SESSION_NAME}" "claude" Enter
 sleep 3
