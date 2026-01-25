@@ -1,5 +1,5 @@
 ---
-description: Install recommended development tools (iTerm, tmux, Marta, Meld, Linear, Slack)
+description: Install recommended development tools and Claude Code plugins
 ---
 
 # /setup - Install Development Tools
@@ -154,9 +154,39 @@ If `~/.tmux.conf` already exists, ask before overwriting:
 
 Report: `Configured ~/.tmux.conf for Claude/TUI compatibility`
 
-### Step 6: Post-Install Configuration
+### Step 6: Install Claude Code Plugins
 
-After installation, suggest optional configuration:
+These plugins enhance `/forge:finish`:
+
+```
+## Claude Code Plugins
+
+The following plugins are recommended for the full forge workflow:
+
+| Plugin | Purpose | Used In |
+|--------|---------|---------|
+| code-simplifier | Simplifies code for clarity | /forge:finish Phase 2.5 |
+| code-review | Multi-agent code review | /forge:finish Phase 7 |
+```
+
+Use AskUserQuestion:
+- Header: "Plugins"
+- Question: "Install recommended Claude Code plugins?"
+- Options:
+  - "Install both (Recommended)" - Install code-simplifier and code-review
+  - "Skip" - Don't install plugins now
+
+If installing, run:
+```bash
+claude plugin install code-simplifier
+claude plugin install code-review
+```
+
+Note: User will need to restart Claude Code after plugin installation.
+
+### Step 7: Post-Install Summary
+
+After installation, show summary:
 
 ```
 ## Setup Complete
@@ -166,16 +196,17 @@ All tools installed successfully.
 **Configured:**
 - ~/.tmux.conf optimized for Claude Code (mouse, colors, no input lag)
 
+**Plugins installed:**
+- code-simplifier (code clarity)
+- code-review (multi-agent review)
+
 **Optional next steps:**
 - Set iTerm2 as default terminal
 - Configure Marta as default file manager
 - Sign in to Linear and Slack
 - Consider installing Warp for an AI-enhanced terminal: `brew install --cask warp`
 
-**Recommended Claude Code plugins:**
-- Code review: `/plugin add anthropics/claude-plugins-official/plugins/code-review`
-
-Run `/forge:start` to begin working on an issue.
+**Restart Claude Code** to load new plugins, then run `/forge:start` to begin working on an issue.
 ```
 
 ## Error Handling
