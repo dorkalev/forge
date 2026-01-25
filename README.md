@@ -14,6 +14,15 @@ These commands require:
 - **Linear MCP server** configured in `.mcp.json`
 - **gh CLI** authenticated (`gh auth login`) - used for all GitHub operations
 
+### Optional Plugins
+
+For full `/forge:finish` functionality, install these Anthropic plugins:
+
+```bash
+/plugin install code-simplifier   # Code simplification (Phase 2.5)
+/plugin install code-review       # Code review (Phase 7)
+```
+
 Example `.mcp.json`:
 ```json
 {

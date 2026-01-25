@@ -47,9 +47,10 @@ then automatically:
 ```
 /forge:finish - Finalize Work Before Pushing
 
-Runs a 9-phase compliance workflow:
+Runs a 10-phase compliance workflow:
   1. Discovery        - Analyze branch, diff changes since staging
   2. Cleanup          - Remove temp files, run formatters
+  2.5 Simplify        - Code simplification (requires code-simplifier plugin)
   3. Spec Alignment   - Verify all changes covered in specs
   4. Issue & Spec     - Update files, sync to Linear
   5. Commit           - Stage and commit changes
@@ -57,6 +58,8 @@ Runs a 9-phase compliance workflow:
   7. Code Review      - Push → /code-review → fix → repeat until clean
   8. PR Ready         - Convert draft to ready, update Linear
   9. CodeRabbit       - Wait → check → fix → repeat until clean
+
+Requires plugins: code-simplifier, code-review (install via /forge:setup)
 ```
 
 ### /forge:help cleanup
@@ -142,7 +145,7 @@ Quickly creates a new Linear issue from a description:
 ### /forge:help setup
 
 ```
-/forge:setup - Install Development Tools
+/forge:setup - Install Development Tools & Plugins
 
 Installs recommended tools via Homebrew:
   - iTerm2 (terminal)
@@ -153,7 +156,9 @@ Installs recommended tools via Homebrew:
   - Slack (communication)
   - ~/.tmux.conf optimized for Claude
 
-Also recommends: Warp, /code-review plugin
+Installs Claude Code plugins:
+  - code-simplifier (code clarity for /finish)
+  - code-review (multi-agent review for /finish)
 ```
 
 ### /forge:help tmux-list

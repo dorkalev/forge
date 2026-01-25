@@ -56,6 +56,7 @@ The cleanup phase must NEVER:
 TodoWrite([
   { content: "Phase 1: Discovery & Analysis", status: "pending" },
   { content: "Phase 2: Cleanup & Consolidation", status: "pending" },
+  { content: "Phase 2.5: Code Simplification", status: "pending" },
   { content: "Phase 3: Spec Alignment Verification", status: "pending" },
   { content: "Phase 4: Issue & Spec File Management", status: "pending" },
   { content: "Phase 5: Commit Changes", status: "pending" },
@@ -119,6 +120,42 @@ Execute a comprehensive pre-push compliance workflow:
 2. Consolidate code where safe
 3. Run linting/formatting
 4. Check for files that should be gitignored
+
+### Phase 2.5: Code Simplification
+
+**Requires**: `code-simplifier` plugin from Anthropic
+
+1. Check if `code-simplifier` is installed:
+   ```bash
+   claude plugin list 2>/dev/null | grep -q "code-simplifier@claude-plugins-official"
+   ```
+
+   If NOT installed, prompt user:
+   ```
+   Code simplification requires the code-simplifier plugin.
+   Install it with: /plugin install code-simplifier
+
+   Options:
+   1. Install now and continue
+   2. Skip code simplification
+   ```
+
+2. Identify source files changed since `staging`:
+   ```bash
+   git diff staging...HEAD --name-only -- '*.py' '*.ts' '*.tsx' '*.js' '*.jsx'
+   git diff --name-only -- '*.py' '*.ts' '*.tsx' '*.js' '*.jsx'
+   ```
+
+3. If source files changed, invoke the `code-simplifier` agent via Task tool:
+   - Pass the list of changed files
+   - Agent will simplify code for clarity and maintainability
+   - Preserves functionality, applies project standards
+
+4. Stage any simplification changes
+
+**Skip this phase if**:
+- No source code files were modified (only config/docs)
+- User chose to skip in step 1
 
 ### Phase 3: Spec Alignment Verification (CRITICAL)
 

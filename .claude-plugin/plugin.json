@@ -1,11 +1,12 @@
 {
   "name": "forge",
-  "version": "1.21.1",
+  "version": "1.22.0",
   "description": "Claude Code commands for Linear-integrated development workflows",
   "author": {
     "name": "Dor Kalev",
     "email": "dor@dorkalev.com"
   },
   "repository": "https://github.com/dorkalev/forge",
-  "commands": "./commands/"
+  "commands": "./commands/",
+  "requiredPlugins": ["code-simplifier@claude-plugins-official"]
 }
