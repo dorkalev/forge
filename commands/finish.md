@@ -64,6 +64,7 @@ TodoWrite([
   { content: "Phase 6: Test Generation", status: "pending" },
   { content: "Phase 7: Push & Code Review Loop", status: "pending" },
   { content: "Phase 8: PR Ready & Linear Sync", status: "pending" },
+  { content: "Phase 8.5: PR Description Compliance", status: "pending" },
   { content: "Phase 9: CodeRabbit Loop", status: "pending" }
 ])
 ```
@@ -79,6 +80,7 @@ Execute a comprehensive pre-push compliance workflow:
 4. Automated code review compliance
 5. Full Linear/GitHub traceability for SOC2 compliance
 6. Bidirectional sync between `issues/` files and Linear issues
+7. **PR description as definitive compliance document** - All tickets linked, changes documented
 
 ## Product vs Technical Documentation
 
@@ -413,6 +415,18 @@ This will:
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
 
+### Phase 8.5: PR Description Compliance (CRITICAL for SOC2)
+
+Invoke `/forge:verify-pr --fix` to ensure the PR is a complete compliance document.
+
+This verifies:
+- ALL Linear tickets from commits appear in PR description
+- PR has meaningful description content (not just links)
+- Each ticket has a comment linking back to the PR
+- PR title includes primary ticket ID
+
+**Do NOT proceed to Phase 9 until `/forge:verify-pr` passes.**
+
 ### Phase 9: CodeRabbit Loop
 
 After PR is ready, CodeRabbit (GitHub bot) will review. Loop until clean:
@@ -449,6 +463,8 @@ Do NOT proceed to push if:
 - Code review has unresolved high-confidence issues
 - Unspeced features remain unaddressed
 - Spec file not aligned with implementation
+- PR description missing Linear tickets from commits
+- PR description has no meaningful content
 
 ## Output Summary
 
@@ -459,6 +475,7 @@ Report at completion:
 - `/code-review` passed (no issues)
 - PR converted from draft to ready
 - Linear issue updated to "In Review"
+- **PR compliance verified** (all tickets linked, description present, cross-links created)
 - CodeRabbit passed (no Major/Critical)
 
 ## Error Handling

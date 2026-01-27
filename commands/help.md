@@ -47,16 +47,18 @@ then automatically:
 ```
 /forge:finish - Finalize Work Before Pushing
 
-Runs a 10-phase compliance workflow:
+Runs an 11-phase compliance workflow:
   1. Discovery        - Analyze branch, diff changes since staging
   2. Cleanup          - Remove temp files, run formatters
   2.5 Simplify        - Code simplification (requires code-simplifier plugin)
   3. Spec Alignment   - Verify all changes covered in specs
   4. Issue & Spec     - Update files, sync to Linear
   5. Commit           - Stage and commit changes
+  5.5 Sync            - Merge latest staging into branch
   6. Tests            - Generate tests (/forge:add-tests)
   7. Code Review      - Push → /code-review → fix → repeat until clean
   8. PR Ready         - Convert draft to ready, update Linear
+  8.5 PR Compliance   - Verify PR covers all tickets (/forge:verify-pr)
   9. CodeRabbit       - Wait → check → fix → repeat until clean
 
 Requires plugins: code-simplifier, code-review (install via /forge:setup)
@@ -101,6 +103,25 @@ Part A: /code-review loop (Anthropic plugin)
 
 Part B: CodeRabbit loop (GitHub bot)
   - Wait 3 min → check comments → fix Major/Critical → push → repeat
+```
+
+### /forge:help verify-pr
+
+```
+/forge:verify-pr - Verify PR Description Compliance (SOC2)
+
+Ensures PR is a complete compliance document:
+  1. Extracts all Linear tickets from commit messages
+  2. Compares with tickets in PR description table
+  3. Validates PR has meaningful description (not just links)
+  4. Verifies cross-links: each ticket has PR comment
+  5. Checks PR title includes ticket ID
+
+Usage:
+  /forge:verify-pr          Check compliance (report only)
+  /forge:verify-pr --fix    Auto-fix missing tickets and cross-links
+
+Called automatically by /forge:finish at Phase 8.5.
 ```
 
 ### /forge:help audit
@@ -284,6 +305,7 @@ UTILITIES (not part of main workflow)
 /forge:worktree           Create worktree for existing branch
 /forge:pr                 Open PR in browser (or create if missing)
 /forge:audit              Dry-run of /forge:finish
+/forge:verify-pr          Verify PR covers all Linear tickets (SOC2)
 /forge:fix-pr             Fix code review + CodeRabbit findings
 /forge:add-tests          Generate unit/integration tests
 /forge:tmux-list          List tmux sessions and attach in iTerm
