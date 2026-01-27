@@ -50,7 +50,19 @@ You are a SOC2 Compliance Auditor. Verify that the current branch meets all comp
 - Check PR description contains Linear issue table
 - Report: PASS has issue table, WARN missing issue table, FAIL no PR found
 
-### 7. Secrets Check
+### 7. PR Body Completeness (SOC2 Audit Record)
+- Check PR body contains required sections for self-contained audit record:
+  - **TL;DR section**: `## TL;DR` present
+  - **Product Requirements section**: `## Product Requirements` present with Summary and Acceptance Criteria
+  - **Technical Implementation section**: `## Technical Implementation` present
+  - **Testing & Verification section**: `## Testing & Verification` present
+  - **Acceptance Criteria verification**: All criteria in table have Status and Verification columns filled
+- Report:
+  - PASS: All sections present, all criteria verified
+  - WARN: Missing optional sections (Out of Scope, Notable Decisions, Audit Trail)
+  - FAIL: Missing required sections or unverified criteria
+
+### 8. Secrets Check
 - Scan diff: `git diff staging...HEAD`
 - Look for: API keys, tokens, passwords, .env values
 - Report: PASS clean, FAIL potential secrets detected
@@ -61,17 +73,37 @@ You are a SOC2 Compliance Auditor. Verify that the current branch meets all comp
 SOC2 Compliance Audit: {BRANCH-NAME}
 ======================================================================
 
-Issue File        {status} {details}
-Spec File         {status} {details}
-Spec Alignment    {status} {details}
-Tests             {status} {details}
-Linear Issue      {status} {details}
-PR Status         {status} {details}
-Secrets Check     {status} {details}
+Issue File          {status} {details}
+Spec File           {status} {details}
+Spec Alignment      {status} {details}
+Tests               {status} {details}
+Linear Issue        {status} {details}
+PR Status           {status} {details}
+PR Body Complete    {status} {details}
+Secrets Check       {status} {details}
 
 ----------------------------------------------------------------------
 Overall: {READY | NOT READY} for /finish
 {If not ready, list what needs to be addressed}
+```
+
+### PR Body Completeness Details
+
+When checking PR body completeness, report section-by-section:
+
+```
+PR Body Completeness:
+  [x] TL;DR section present
+  [x] Linear Tickets table
+  [x] Product Requirements section
+      [x] Summary
+      [x] Acceptance Criteria (5 items, all verified)
+      [x] Out of Scope
+  [x] Technical Implementation section
+      [x] Architecture Summary
+      [x] Key Changes table
+  [x] Testing & Verification table
+  [ ] Audit Trail section (optional)
 ```
 
 ## Status Icons

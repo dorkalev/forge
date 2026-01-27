@@ -64,7 +64,7 @@ TodoWrite([
   { content: "Phase 6: Test Generation", status: "pending" },
   { content: "Phase 7: Push & Code Review Loop", status: "pending" },
   { content: "Phase 8: PR Ready & Linear Sync", status: "pending" },
-  { content: "Phase 8.5: PR Description Compliance", status: "pending" },
+  { content: "Phase 8.5: Build PR Compliance Document", status: "pending" },
   { content: "Phase 9: CodeRabbit Loop", status: "pending" }
 ])
 ```
@@ -80,7 +80,7 @@ Execute a comprehensive pre-push compliance workflow:
 4. Automated code review compliance
 5. Full Linear/GitHub traceability for SOC2 compliance
 6. Bidirectional sync between `issues/` files and Linear issues
-7. **PR description as definitive compliance document** - All tickets linked, changes documented
+7. **PR as self-contained SOC2 audit record** - Full product spec, technical highlights, verification evidence, all in the PR body
 
 ## Product vs Technical Documentation
 
@@ -178,7 +178,7 @@ git diff --cached         # uncommitted (staged)
 
 Read the issue file from `issues/{ISSUE_ID}.md`.
 Read the spec file from `specs/{feature-name}.md`.
-Fetch Linear ticket content using Linear MCP: `linear_get_issue(issueId: "<id>")`
+Fetch Linear ticket content using Linear MCP: `linear_get_issue(id: "<ticket-id>")`
 
 #### Step 3.2: Cross-Reference Analysis
 
@@ -266,8 +266,8 @@ Options:
 
 Execute choices using Linear MCP:
 - **Update issue**: `linear_update_issue(issueId, description: "<updated>")`
-- **Create issue**: `linear_create_issue(...)` then `linear_add_comment(issueId, "Related: <new-issue-url>")`
-- **Add comment**: `linear_add_comment(issueId, body: "<explanation>")`
+- **Create issue**: `linear_create_issue(...)` then `linear_create_comment(issueId, "Related: <new-issue-url>")`
+- **Add comment**: `linear_create_comment(issueId, body: "<explanation>")`
 
 #### Step 3.4: Final Alignment Check
 
@@ -407,7 +407,7 @@ This will:
 
 4. Add PR link to Linear issue:
    ```
-   linear_add_comment(issueId: "<id>", body: "PR: <url>")
+   linear_create_comment(issueId: "<id>", body: "PR: <url>")
    ```
 
 5. Update Linear issue state to "In Review":
@@ -415,15 +415,27 @@ This will:
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
 
-### Phase 8.5: PR Description Compliance (CRITICAL for SOC2)
+### Phase 8.5: Build Comprehensive PR Document (CRITICAL for SOC2)
 
-Invoke `/forge:verify-pr --fix` to ensure the PR is a complete compliance document.
+Invoke `/forge:verify-pr --fix` to build the PR into a **self-contained SOC2 audit record**.
 
-This verifies:
-- ALL Linear tickets from commits appear in PR description
-- PR has meaningful description content (not just links)
-- Each ticket has a comment linking back to the PR
-- PR title includes primary ticket ID
+This builds a comprehensive PR body containing:
+- **TL;DR**: One-sentence summary of the change
+- **Linear Tickets**: Table with all tickets, titles, and status
+- **Product Requirements**: Full content from `issues/` files (Summary, Acceptance Criteria, Out of Scope)
+- **Technical Implementation**: Condensed from `specs/` (Architecture, Key Changes, Notable Decisions)
+- **Testing & Verification**: Table showing test status and manual verification
+- **Audit Trail**: Cross-links and scope change notes
+
+The workflow will:
+1. Gather sources from commits, issues/, specs/, and Linear
+2. Prompt for verification of each acceptance criterion
+3. Detect unspecced changes and resolve them
+4. Build and update the PR body
+5. Validate all ticket links (404 check)
+6. Add cross-links to Linear issues
+
+**An auditor should be able to understand the entire change from the PR alone.**
 
 **Do NOT proceed to Phase 9 until `/forge:verify-pr` passes.**
 
@@ -463,8 +475,9 @@ Do NOT proceed to push if:
 - Code review has unresolved high-confidence issues
 - Unspeced features remain unaddressed
 - Spec file not aligned with implementation
-- PR description missing Linear tickets from commits
-- PR description has no meaningful content
+- PR missing required sections (TL;DR, Product Requirements, Technical Implementation)
+- Acceptance criteria not verified
+- Unspecced changes detected without resolution
 
 ## Output Summary
 
@@ -475,7 +488,7 @@ Report at completion:
 - `/code-review` passed (no issues)
 - PR converted from draft to ready
 - Linear issue updated to "In Review"
-- **PR compliance verified** (all tickets linked, description present, cross-links created)
+- **PR compliance document built** (Product Requirements, Technical Implementation, Acceptance Criteria verified, cross-links created)
 - CodeRabbit passed (no Major/Critical)
 
 ## Error Handling

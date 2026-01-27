@@ -99,16 +99,17 @@ Use AskUserQuestion to get input:
    **State:** {state}
    **URL:** {url}
 
-   ## Description
+   ## Summary
 
    {description}
 
-   ## Tasks
+   ## Acceptance Criteria
 
-   - [ ] Review requirements
-   - [ ] Implement solution
-   - [ ] Write tests
-   - [ ] Update documentation
+   - [ ] {Extract from Linear description or prompt user}
+
+   ## Out of Scope
+
+   - TBD (clarify during implementation)
    ```
 
 5. Commit and push:
@@ -120,21 +121,29 @@ Use AskUserQuestion to get input:
 
 ### Step 5: Create Draft PR
 
+Create a minimal placeholder PR. The full compliance document will be built by `/forge:finish`.
+
 ```bash
 gh pr create \
   --draft \
   --head "${BRANCH_NAME}" \
   --base staging \
   --title "${IDENTIFIER}: ${TITLE}" \
-  --body "## Linear Issue
+  --body "## Linear Tickets
 
-| Issue | Title |
-|-------|-------|
-| [${IDENTIFIER}](${URL}) | ${TITLE} |
+| Ticket | Title | Status |
+|--------|-------|--------|
+| [${IDENTIFIER}](${URL}) | ${TITLE} | In Progress |
+
+---
 
 ## Description
 
-${DESCRIPTION}"
+${DESCRIPTION}
+
+---
+
+*Run \`/forge:finish\` to build comprehensive compliance document with Product Requirements, Technical Implementation, and Acceptance Criteria verification.*"
 ```
 
 ### Step 6: Create Worktree
