@@ -1,10 +1,10 @@
 ---
-description: Verify PR description covers all Linear tickets from commits (SOC2 compliance)
+description: Build comprehensive PR compliance document (SOC2 audit record)
 ---
 
-# /verify-pr - PR Description Compliance Verification
+# /verify-pr - Build Comprehensive PR Compliance Document
 
-You are an elite DevOps Compliance Engineer ensuring complete traceability between code changes and Linear tickets.
+You are an elite DevOps Compliance Engineer ensuring the PR is a **self-contained SOC2 audit record**.
 
 **Prerequisites**: Linear MCP server must be configured in `.mcp.json`
 
@@ -12,42 +12,107 @@ You are an elite DevOps Compliance Engineer ensuring complete traceability betwe
 
 ```
 /verify-pr
-/verify-pr --fix    # Auto-fix missing tickets and description
+/verify-pr --fix    # Auto-fix: build comprehensive PR body
 ```
-
-Run this to verify the PR description is a complete compliance document linking all related Linear tickets.
 
 ## Why This Matters (SOC2)
 
-The PR description is the **definitive compliance audit trail**. It must:
-- Link ALL Linear tickets referenced in commits
-- Explain WHAT changed and WHY
-- Enable bidirectional traceability (PR ↔ Linear)
+The PR is the **definitive compliance audit trail**. An auditor should be able to look at ANY merged PR and immediately understand:
 
-An auditor should be able to look at any merged PR and immediately understand:
-1. Which tickets authorized this change
-2. What was actually changed
-3. Who approved it (via reviews)
+1. What was the product requirement? (Product Requirements section)
+2. How was it implemented? (Technical Implementation section)
+3. How was it verified? (Acceptance Criteria table with verification)
+4. Which tickets authorized it? (Linear Tickets table with validated links)
+
+**Without leaving the GitHub PR page.**
+
+## Target PR Structure
+
+```markdown
+# ENG-123: Feature Title
+
+## TL;DR
+One-sentence summary of what this PR accomplishes.
+
+---
+
+## Linear Tickets
+| Ticket | Title | Status |
+|--------|-------|--------|
+| [ENG-123](url) | Main Feature | Done |
+| [ENG-124](url) | Related Fix | Done |
+
+---
+
+## Product Requirements
+
+### Summary
+{From issues/{TICKET}.md - the business problem being solved}
+
+### Acceptance Criteria
+| # | Criterion | Status | Verification |
+|---|-----------|--------|--------------|
+| 1 | User can do X | [x] Done | Test: test_feature.py |
+| 2 | System handles Y | [x] Done | Manual: verified logs |
+| 3 | Performance meets Z | [x] Done | Review: code inspection |
+
+### Out of Scope
+- {Items explicitly excluded}
+
+---
+
+## Technical Implementation
+
+### Architecture Summary
+{Condensed from specs/{feature}.md - key technical approach}
+
+### Key Changes
+| File | Change | Description |
+|------|--------|-------------|
+| src/module.py | Modified | Added feature X handler |
+| tests/test_module.py | Added | Unit tests for feature X |
+
+### Notable Decisions
+- **Decision**: {What was decided}
+- **Rationale**: {Why}
+
+---
+
+## Testing & Verification
+| Type | Status | Details |
+|------|--------|---------|
+| Unit | Passed | 12 tests |
+| Integration | Passed | Pipeline e2e |
+| Manual | Passed | Verified in staging |
+
+---
+
+## Audit Trail
+- All tickets linked with comments
+- Scope changes: {None | Listed}
+
+---
+*Verified by Forge compliance workflow*
+```
 
 ## Workflow
 
-### Step 1: Get PR Information
+### Phase 1: Gather Sources
+
+#### 1.1: Get PR Information
 
 ```bash
-# Get current branch
 BRANCH=$(git branch --show-current)
-
-# Find PR for this branch
 gh pr list --head "$BRANCH" --base staging --json number,url,title,body
 ```
 
-If no PR exists, report error and exit:
+If no PR exists:
 ```
-❌ No PR found for branch: $BRANCH
-   Run /forge:pr to create one first.
+No PR found for branch: $BRANCH
+Run /forge:pr to create one first.
 ```
 
-### Step 2: Extract Linear Tickets from Commits
+#### 1.2: Extract Tickets from Commits
 
 Scan ALL commit messages since staging:
 
@@ -63,159 +128,347 @@ Build regex patterns dynamically:
 
 Extract all unique ticket IDs found in commits.
 
-### Step 3: Extract Tickets from PR Description
+#### 1.3: Read Issue Files
 
-Parse the PR body for the Linear Tickets table:
-
-```markdown
-## Linear Tickets
-
-| Ticket | Title |
-|--------|-------|
-| [ENG-123](url) | Title |
-```
-
-Extract ticket IDs already documented.
-
-### Step 4: Compare and Report
+For each ticket ID, read the corresponding issue file:
 
 ```
-📋 PR Compliance Check: #<pr-number>
-
-TICKETS IN COMMITS:
-  ✓ ENG-123 (in PR)
-  ✓ ENG-124 (in PR)
-  ✗ TEAM-45 (MISSING from PR)
-
-PR DESCRIPTION:
-  ✓ Has Linear Tickets table
-  ✗ Description section is empty
-
-PR TITLE:
-  ✗ Missing ticket ID prefix
-
-CROSS-LINKS:
-  ✓ ENG-123 has PR link
-  ✓ ENG-124 has PR link
-  ✗ TEAM-45 missing PR link
+issues/{TICKET_ID}.md
 ```
 
-### Step 5: Fix Mode (--fix or prompted)
+Parse the issue file for:
+- **Summary**: The "## Summary" or "## Description" section
+- **Acceptance Criteria**: The "## Acceptance Criteria" section (list of `- [ ]` or `- [x]` items)
+- **Out of Scope**: The "## Out of Scope" section
 
-If issues found, ask user:
-```
-Issues found. Fix automatically?
-1. Yes - Update PR and add cross-links
-2. No - Just report (I'll fix manually)
-```
-
-#### 5a: Add Missing Tickets to PR
-
-For each missing ticket, fetch from Linear:
+If issue file doesn't exist, fetch from Linear:
 ```
 linear_get_issue(id: "<ticket-id>")
 ```
 
-Build updated ticket table with ALL tickets.
+#### 1.4: Read Spec File
 
-#### 5b: Validate/Request Description
+Derive feature name from branch (e.g., `eng-123-fix-login` -> look for `specs/fix-login.md` or `specs/eng-123-fix-login.md`).
 
-If description is empty or too brief (< 20 words), prompt:
-```
-PR description is missing or too brief.
-
-The PR description is your compliance audit trail. It should explain:
-- What was changed (brief technical summary)
-- Why it was changed (business context)
-- Any notable decisions or trade-offs
-
-Please provide a PR description (2-5 sentences):
-```
-
-#### 5c: Update PR Title
-
-If PR title doesn't include a ticket ID, update it:
 ```bash
-gh pr edit <pr-number> --title "<primary-ticket>: <current-title>"
+# Try exact match first
+ls specs/*${TICKET_ID}*.md 2>/dev/null || ls specs/*.md | head -5
 ```
 
-Use the first ticket from commits as primary.
+Parse the spec file for:
+- **Architecture Summary**: First paragraph or "## Overview" section
+- **Key Changes**: "## Changes" or "## Implementation" section
+- **Notable Decisions**: "## Decisions" or "## Trade-offs" section
 
-#### 5d: Build and Update PR Body
+#### 1.5: Fetch Linear Status
+
+For each ticket, verify it exists and get current status:
+```
+linear_get_issue(id: "<ticket-id>")
+```
+
+### Phase 2: Verification Prompts
+
+For each acceptance criterion from the issue file, prompt the user to confirm verification:
+
+```
+Acceptance Criterion: "User can log in with email"
+How was this verified?
+
+1. Test file (specify which test)
+2. Manual verification (describe what you checked)
+3. Code review (inspection only)
+4. N/A (not applicable to this PR)
+```
+
+Use AskUserQuestion tool with options:
+- Header: "Verify"
+- Question: "How was '{criterion}' verified?"
+- Options:
+  - "Test: {auto-suggest test file if found}"
+  - "Manual: describe"
+  - "Review: code inspection"
+  - "N/A: not in scope"
+
+Store each verification response for the acceptance criteria table.
+
+### Phase 3: Detect Unspecced Changes
+
+Compare the diff against what's documented:
+
+```bash
+git diff staging...HEAD --name-only
+```
+
+For each changed file, check if it's mentioned in:
+1. The spec file
+2. The issue file's acceptance criteria
+3. A related ticket
+
+If a file change doesn't map to any documentation:
+
+```
+UNSPECCED CHANGE DETECTED:
+File: src/new_feature.py
+Not found in: specs/, issues/, or ticket descriptions
+
+Options:
+1. Add to current ticket scope - Update Linear issue
+2. Create new ticket - Separate for traceability
+3. Expected (infra/config) - Note in PR description
+```
+
+### Phase 4: Build Comprehensive PR Body
+
+#### 4.1: Build TL;DR
+
+Generate a one-sentence summary combining:
+- Primary ticket title
+- Key change description
+
+Example: "Fixed vibration processor Docker entrypoint to run job_entrypoint.py instead of analyst_agent."
+
+#### 4.2: Build Linear Tickets Table
 
 ```markdown
 ## Linear Tickets
-
-| Ticket | Title |
-|--------|-------|
-| [ENG-123](https://linear.app/team/issue/ENG-123) | Main feature title |
-| [ENG-124](https://linear.app/team/issue/ENG-124) | Related fix |
-| [TEAM-45](https://linear.app/team/issue/TEAM-45) | Dashboard update |
-
-## Description
-
-[User-provided or existing description]
-
-## Changes
-
-- [Auto-generated summary of key changes from diff]
-
----
-🤖 Verified by [Forge](https://github.com/dorkalev/forge) compliance workflow
+| Ticket | Title | Status |
+|--------|-------|--------|
+| [ENG-123](https://linear.app/team/issue/ENG-123) | Main Feature | Done |
 ```
 
-Update PR:
+For each ticket, include:
+- Link to Linear
+- Title from Linear
+- Status from verification (Done, In Progress, etc.)
+
+#### 4.3: Build Product Requirements Section
+
+Pull directly from `issues/{TICKET}.md`:
+
+```markdown
+## Product Requirements
+
+### Summary
+{issues/ Summary section}
+
+### Acceptance Criteria
+| # | Criterion | Status | Verification |
+|---|-----------|--------|--------------|
+| 1 | {criterion text} | [x] Done | {verification from Phase 2} |
+| 2 | {criterion text} | [x] Done | {verification from Phase 2} |
+
+### Out of Scope
+{issues/ Out of Scope section}
+```
+
+**For multiple tickets**: Create subsections:
+```markdown
+## Product Requirements
+
+### ENG-123: Main Feature
+
+#### Summary
+...
+
+#### Acceptance Criteria
+...
+
+### ENG-124: Related Fix
+
+#### Summary
+...
+```
+
+#### 4.4: Build Technical Implementation Section
+
+Condense from `specs/{feature}.md`:
+
+```markdown
+## Technical Implementation
+
+### Architecture Summary
+{First 2-3 sentences from spec overview}
+
+### Key Changes
+| File | Change | Description |
+|------|--------|-------------|
+```
+
+Generate Key Changes table from git diff:
+```bash
+git diff staging...HEAD --stat
+```
+
+Map each file to a brief description from the spec or commit messages.
+
+#### 4.5: Build Notable Decisions
+
+If spec has a "Decisions" or "Trade-offs" section, include key items:
+
+```markdown
+### Notable Decisions
+- **Decision**: Use CMD override vs separate Dockerfile
+- **Rationale**: Simpler, single Dockerfile for both modes
+```
+
+If no decisions documented, omit this section.
+
+#### 4.6: Build Testing & Verification Table
+
+```markdown
+## Testing & Verification
+| Type | Status | Details |
+|------|--------|---------|
+| Unit | {Passed/Failed/N/A} | {count} tests |
+| Integration | {Passed/Failed/N/A} | {description} |
+| Manual | {Passed/Skipped} | {what was verified} |
+```
+
+Detect test status:
+```bash
+# Find test files in diff
+git diff staging...HEAD --name-only | grep -E "test_|_test\.|\.test\."
+```
+
+#### 4.7: Build Audit Trail
+
+```markdown
+## Audit Trail
+- All tickets linked with PR comments
+- Scope changes: {None | list any scope expansions noted in Phase 3}
+```
+
+#### 4.8: Assemble Full PR Body
+
+Combine all sections. For readability, consider using collapsible `<details>` for lengthy sections:
+
+```markdown
+<details>
+<summary>Full Acceptance Criteria (12 items)</summary>
+
+| # | Criterion | Status | Verification |
+...
+
+</details>
+```
+
+The PR is the single source of truth - include all necessary information regardless of length.
+
+### Phase 5: Update PR
+
+#### 5.1: Update PR Title
+
+If PR title doesn't include ticket ID:
+```bash
+gh pr edit <pr-number> --title "<primary-ticket>: <title>"
+```
+
+#### 5.2: Update PR Body
+
 ```bash
 gh pr edit <pr-number> --body "$(cat <<'EOF'
-<full-pr-body>
+<assembled-pr-body>
 EOF
 )"
 ```
 
-#### 5e: Add Cross-Links to Linear
+#### 5.3: Validate Ticket Links (404 Check)
+
+For each ticket link in the PR:
+```bash
+curl -s -o /dev/null -w "%{http_code}" "https://linear.app/team/issue/ENG-123"
+```
+
+Report any broken links.
+
+#### 5.4: Add Cross-Links to Linear
 
 For each ticket, check if PR is already linked:
 ```
 linear_list_comments(issueId: "<id>")
 ```
 
-If no comment contains the PR URL, add one:
+If no comment contains the PR URL:
 ```
-linear_create_comment(issueId: "<id>", body: "🔗 PR: <pr-url>")
+linear_create_comment(issueId: "<id>", body: "PR: <pr-url>")
 ```
 
-### Step 6: Final Report
+### Phase 6: Final Report
 
 ```
-✅ PR Compliance Verified
+PR Compliance Document Built
 
    PR: #123 - ENG-123: Implement feature X
    URL: https://github.com/org/repo/pull/123
 
-   Tickets: 3/3 covered
-   - ENG-123: Main feature ✓
-   - ENG-124: Related fix ✓
-   - TEAM-45: Dashboard update ✓
+   Sections:
+   [x] TL;DR
+   [x] Linear Tickets (3)
+   [x] Product Requirements
+   [x] Acceptance Criteria (5/5 verified)
+   [x] Technical Implementation
+   [x] Testing & Verification
+   [x] Audit Trail
 
-   Description: Present (147 words)
-   Cross-links: 3/3 tickets linked to PR
+   Cross-links: 3/3 tickets have PR comments
 
-   Ready for review ✓
+   Ready for review
 ```
 
 Or if issues remain:
-```
-❌ PR Compliance Failed
 
-   Missing from PR: TEAM-45
-   Description: Empty
+```
+PR Compliance Failed
+
+   Missing verifications:
+   - Criterion #3: "Performance meets SLA" - not verified
+
+   Unspecced changes:
+   - src/utils/helper.py - not documented
 
    Run /verify-pr --fix to resolve
 ```
 
+## Handling Edge Cases
+
+### No Issue File Exists
+
+If `issues/{TICKET}.md` doesn't exist:
+1. Fetch from Linear: `linear_get_issue(id: "<ticket-id>")`
+2. Use Linear description as Summary
+3. Note in Audit Trail: "Issue file generated from Linear"
+
+### No Spec File Exists
+
+If no spec file found:
+1. Use commit messages for Technical Implementation
+2. Generate Key Changes from diff only
+3. Note in Audit Trail: "No spec file - implementation details from commits"
+
+### Multiple Tickets
+
+When PR covers multiple tickets:
+1. Primary ticket (first in commits) provides TL;DR
+2. Each ticket gets its own subsection in Product Requirements
+3. Combine all acceptance criteria into single verification table
+4. Single Technical Implementation section covers all
+
+### Large PRs
+
+For readability, consider collapsible sections for lengthy content:
+```markdown
+<details>
+<summary>Product Requirements (click to expand)</summary>
+...
+</details>
+```
+
+Keep TL;DR, Linear Tickets, and Testing tables always visible. The PR is the single source of truth - completeness is more important than brevity.
+
 ## Exit Codes
 
-- **Pass**: All tickets covered, description present, cross-links exist
-- **Fail**: Missing tickets, empty description, or missing cross-links
+- **Pass**: All sections present, all criteria verified, cross-links exist
+- **Fail**: Missing verifications, unspecced changes, or broken links
 
 When invoked from `/forge:finish`, a failure blocks the workflow.

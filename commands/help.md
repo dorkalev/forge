@@ -58,8 +58,12 @@ Runs an 11-phase compliance workflow:
   6. Tests            - Generate tests (/forge:add-tests)
   7. Code Review      - Push → /code-review → fix → repeat until clean
   8. PR Ready         - Convert draft to ready, update Linear
-  8.5 PR Compliance   - Verify PR covers all tickets (/forge:verify-pr)
+  8.5 PR Document     - Build comprehensive PR audit record (/forge:verify-pr)
   9. CodeRabbit       - Wait → check → fix → repeat until clean
+
+Phase 8.5 builds PR with: TL;DR, Product Requirements (from issues/),
+Technical Implementation (from specs/), Acceptance Criteria verification,
+Testing table, and Audit Trail. Auditors can understand the change from PR alone.
 
 Requires plugins: code-simplifier, code-review (install via /forge:setup)
 ```
@@ -108,19 +112,39 @@ Part B: CodeRabbit loop (GitHub bot)
 ### /forge:help verify-pr
 
 ```
-/forge:verify-pr - Verify PR Description Compliance (SOC2)
+/forge:verify-pr - Build Comprehensive PR Compliance Document (SOC2)
 
-Ensures PR is a complete compliance document:
-  1. Extracts all Linear tickets from commit messages
-  2. Compares with tickets in PR description table
-  3. Validates PR has meaningful description (not just links)
-  4. Verifies cross-links: each ticket has PR comment
-  5. Checks PR title includes ticket ID
+Transforms the PR into a self-contained SOC2 audit record:
+
+  Phase 1: Gather Sources
+    - Extract tickets from commits
+    - Read issues/{TICKET}.md for product requirements
+    - Read specs/{feature}.md for technical details
+    - Fetch Linear issue status
+
+  Phase 2: Verification
+    - Prompt for verification of each acceptance criterion
+    - Detect unspecced changes in diff
+
+  Phase 3: Build PR Body
+    - TL;DR (one-sentence summary)
+    - Linear Tickets table (with status)
+    - Product Requirements (full issues/ content)
+    - Technical Implementation (condensed specs/)
+    - Acceptance Criteria (with verification evidence)
+    - Testing & Verification table
+    - Audit Trail
+
+  Phase 4: Update PR
+    - Update PR title and body
+    - Validate ticket links (404 check)
+    - Add cross-links to Linear issues
 
 Usage:
   /forge:verify-pr          Check compliance (report only)
-  /forge:verify-pr --fix    Auto-fix missing tickets and cross-links
+  /forge:verify-pr --fix    Build comprehensive PR body
 
+An auditor can understand the entire change from the PR alone.
 Called automatically by /forge:finish at Phase 8.5.
 ```
 
@@ -130,11 +154,14 @@ Called automatically by /forge:finish at Phase 8.5.
 /forge:audit - Dry-Run Compliance Check
 
 Read-only check of SOC2 compliance status:
-  - Issue file exists
-  - Spec file exists and aligned
-  - Tests exist
+  - Issue file exists with Summary and Acceptance Criteria
+  - Spec file exists and aligned with implementation
+  - Tests exist and pass
   - Linear issue linked
   - PR has issue table
+  - PR body completeness:
+    - Has TL;DR, Product Requirements, Technical Implementation sections
+    - All acceptance criteria have verification status
   - No secrets in diff
 
 Does NOT make changes - just reports status.
@@ -305,7 +332,7 @@ UTILITIES (not part of main workflow)
 /forge:worktree           Create worktree for existing branch
 /forge:pr                 Open PR in browser (or create if missing)
 /forge:audit              Dry-run of /forge:finish
-/forge:verify-pr          Verify PR covers all Linear tickets (SOC2)
+/forge:verify-pr          Build comprehensive PR audit document (SOC2)
 /forge:fix-pr             Fix code review + CodeRabbit findings
 /forge:add-tests          Generate unit/integration tests
 /forge:tmux-list          List tmux sessions and attach in iTerm
