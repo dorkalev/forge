@@ -148,7 +148,10 @@ Execute a comprehensive pre-push compliance workflow:
    git diff --name-only -- '*.py' '*.ts' '*.tsx' '*.js' '*.jsx'
    ```
 
-3. If source files changed, invoke the `code-simplifier` agent via Task tool:
+3. If source files changed, invoke the code-simplifier agent:
+   ```
+   Task tool with subagent_type="code-simplifier:code-simplifier"
+   ```
    - Pass the list of changed files
    - Agent will simplify code for clarity and maintainability
    - Preserves functionality, applies project standards
