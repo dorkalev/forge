@@ -123,8 +123,8 @@ git log staging..HEAD --format="%s%n%b"
 Read `.forge` file to get `LINEAR_PROJECTS` (e.g., `VLAD,ENGINEERING,INFRA,ALGO,XD`).
 
 Build regex patterns dynamically:
-- `ENG-\d+` for ENGINEERING (legacy prefix)
-- `TEAM-\d+`, `INFRA-\d+`, `ALGO-\d+`, `XD-\d+`
+- `ENG-\d+` for ENGINEERING (example prefix)
+- `TEAM-\d+`, `INFRA-\d+`, `PROJ-\d+`, `XD-\d+`
 
 Extract all unique ticket IDs found in commits.
 
@@ -234,7 +234,7 @@ Example: "Fixed vibration processor Docker entrypoint to run job_entrypoint.py i
 ## Linear Tickets
 | Ticket | Title | Status |
 |--------|-------|--------|
-| [ENG-123](https://linear.app/team/issue/ENG-123) | Main Feature | Done |
+| [TEAM-123](https://linear.app/team/issue/TEAM-123) | Main Feature | Done |
 ```
 
 For each ticket, include:
@@ -377,7 +377,7 @@ EOF
 
 For each ticket link in the PR:
 ```bash
-curl -s -o /dev/null -w "%{http_code}" "https://linear.app/team/issue/ENG-123"
+curl -s -o /dev/null -w "%{http_code}" "https://linear.app/team/issue/TEAM-123"
 ```
 
 Report any broken links.
