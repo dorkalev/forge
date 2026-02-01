@@ -1,6 +1,6 @@
 {
   "name": "forge",
-  "version": "1.24.1",
+  "version": "1.25.0",
   "description": "Claude Code commands for Linear-integrated development workflows",
   "author": {
     "name": "Dor Kalev",
