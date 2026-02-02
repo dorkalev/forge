@@ -6,6 +6,10 @@ description: Build comprehensive PR compliance document (SOC2 audit record)
 
 You are an elite DevOps Compliance Engineer ensuring the PR is a **self-contained SOC2 audit record**.
 
+> **⚠️ CRITICAL**: Before building the PR body, you MUST run the Ticket Traceability Check (Phase 1.6).
+> This compares tickets in commits vs PR description. Do NOT skip this step - it's the most important
+> SOC2 verification. Building a "nice looking" PR without this check defeats the purpose of compliance.
+
 **Prerequisites**: Linear MCP server must be configured in `.mcp.json`
 
 ## Usage
@@ -166,6 +170,59 @@ For each ticket, verify it exists and get current status:
 ```
 linear_get_issue(id: "<ticket-id>")
 ```
+
+#### 1.6: MANDATORY Ticket Traceability Check (BLOCKING)
+
+**This step is CRITICAL and must not be skipped.**
+
+Compare tickets found in commits against tickets in current PR body:
+
+```bash
+# Get tickets from commits
+COMMITS_TICKETS=$(git log staging..HEAD --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
+
+# Get tickets from current PR body
+PR_BODY=$(gh pr view --json body -q '.body')
+PR_TICKETS=$(echo "$PR_BODY" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
+
+# Find discrepancies
+MISSING_FROM_PR=$(comm -23 <(echo "$COMMITS_TICKETS") <(echo "$PR_TICKETS"))
+EXTRA_IN_PR=$(comm -13 <(echo "$COMMITS_TICKETS") <(echo "$PR_TICKETS"))
+```
+
+Also check for commits WITHOUT ticket IDs:
+```bash
+git log staging..HEAD --oneline | grep -v "[A-Z]\+-[0-9]\+" | grep -v "^[a-f0-9]* Merge"
+```
+
+**Output a compliance report before proceeding:**
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║                 TICKET TRACEABILITY CHECK                     ║
+╠══════════════════════════════════════════════════════════════╣
+║ Tickets in commits:  ENG-123, ENG-124, ENG-125, XD-42        ║
+║ Tickets in PR body:  ENG-123, ENG-125                        ║
+╠══════════════════════════════════════════════════════════════╣
+║ ❌ MISSING FROM PR:  ENG-124, XD-42                          ║
+║ ⚠️  UNTRACKED COMMITS: 3 commits without ticket IDs          ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+**If discrepancies exist, STOP and ask user:**
+
+Use AskUserQuestion tool:
+- Header: "Compliance"
+- Question: "Found {N} tickets in commits not in PR, and {M} untracked commits. How to proceed?"
+- Options:
+  - "Add missing tickets to PR" (recommended)
+  - "These are from merge commits - note in audit trail"
+  - "Create tickets for untracked commits"
+  - "Abort - I'll fix manually"
+
+**Do NOT proceed to Phase 4 (Build PR Body) until all tickets are accounted for.**
+
+This prevents the common mistake of building a "nice looking" PR that doesn't actually trace to all code changes.
 
 ### Phase 2: Verification Prompts
 
