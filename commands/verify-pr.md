@@ -118,10 +118,10 @@ Run /forge:pr to create one first.
 
 #### 1.2: Extract Tickets from Commits
 
-Scan ALL commit messages since staging:
+Scan ALL commit messages since staging (excluding merge commits to avoid picking up tickets already in staging):
 
 ```bash
-git log staging..HEAD --format="%s%n%b"
+git log staging..HEAD --no-merges --format="%s%n%b"
 ```
 
 Read `.forge` file to get `LINEAR_PROJECTS` (e.g., `VLAD,ENGINEERING,INFRA,ALGO,XD`).
@@ -178,8 +178,8 @@ linear_get_issue(id: "<ticket-id>")
 Compare tickets found in commits against tickets in current PR body:
 
 ```bash
-# Get tickets from commits
-COMMITS_TICKETS=$(git log staging..HEAD --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
+# Get tickets from commits (exclude merge commits to avoid staging tickets)
+COMMITS_TICKETS=$(git log staging..HEAD --no-merges --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
 
 # Get tickets from current PR body
 PR_BODY=$(gh pr view --json body -q '.body')
