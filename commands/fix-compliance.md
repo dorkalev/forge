@@ -10,18 +10,17 @@ You are an elite DevOps Compliance Engineer. The SOC2 compliance check in CI fai
 
 ```
 /fix-compliance
-/fix-compliance --files "path/to/file1.py,path/to/file2.py"
-/fix-compliance --tickets "BOL-123,BOL-456"
+/fix-compliance --tickets "PROJ-123,PROJ-456"
 ```
 
 ## What This Command Does
 
 This command fixes common SOC2 compliance failures:
 
-1. **Undocumented code changes** - Files changed but not in PR's Key Changes table
-2. **Invalid tickets** - Tickets referenced but don't exist in Linear
-3. **Ghost tickets** - Tickets listed but no corresponding code changes
-4. **Inherited tickets** - Tickets that came from merge commits
+1. **Invalid tickets** - Tickets referenced but don't exist in Linear
+2. **Ghost tickets** - Tickets listed but no corresponding code changes
+3. **Inherited tickets** - Tickets that came from merge commits (should be removed)
+4. **Missing tickets** - Code changes without any ticket reference
 
 ## SOC2 Compliance Model
 
@@ -29,11 +28,13 @@ The PR description is the **central junction** for audit traceability:
 
 ```
 Linear Tickets ←→ PR Description ←→ Code Changes
-       ↕                                    ↕
-  issues/*.md                          specs/*.md
+       ↕
+  issues/*.md
 ```
 
 Every code change must trace back to a Linear ticket. The PR is the audit record.
+
+**Note**: File-level documentation is NOT required. You don't need a list of every file changed in the PR description. What matters is that tickets are properly linked and each ticket describes the scope of work.
 
 ## Workflow
 
@@ -45,71 +46,60 @@ Every code change must trace back to a Linear ticket. The PR is the audit record
    gh pr view --json body,number,title -q '.'
    ```
 
-2. Get changed files:
-   ```bash
-   git diff staging...HEAD --name-only
-   ```
-
-3. Get tickets from commits (excluding merge commits):
+2. Get tickets from commits (excluding merge commits):
    ```bash
    git log staging..HEAD --no-merges --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u
    ```
 
-4. Parse current PR Key Changes table (if exists)
+3. Get tickets from merge commits (these should NOT be in PR):
+   ```bash
+   git log staging..HEAD --merges --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u
+   ```
+
+4. Parse current PR Linear Tickets table (if exists)
 
 ### Phase 2: Identify Gaps
 
 Compare:
-- Files in diff vs files in Key Changes table
-- Tickets in commits vs tickets in Linear Tickets table
-- Tickets in PR vs actual Linear issues
+- Tickets in non-merge commits vs tickets in Linear Tickets table
+- Tickets from merge commits that shouldn't be included
+- Tickets in PR vs actual Linear issues (verify they exist)
 
 Build a gap report:
 ```
-UNDOCUMENTED FILES:
-- web/backoffice/api_routes.py
-- algo/scripts/migrate_npz.py
-
 TICKETS IN COMMITS BUT NOT IN PR:
-- BOL-407
+- PROJ-407
 
-FILES WITHOUT TICKET MAPPING:
-- infra/terraform/*.tf (no ticket covers infra changes)
+TICKETS FROM MERGE COMMITS (remove these):
+- PROJ-335
+
+INVALID TICKETS (not found in Linear):
+- PROJ-999
 ```
 
 ### Phase 3: Resolve Each Gap
 
-For each undocumented file, determine appropriate action:
+**Missing tickets**: Add to Linear Tickets table
 
-**Option A: Map to existing ticket**
-If the file change is part of an existing ticket's scope:
-- Add to Key Changes table with that ticket
+**Inherited tickets (from merges)**: Remove from Linear Tickets table
 
-**Option B: Create new ticket**
-If the file change is unrelated to existing tickets:
+**Invalid tickets**:
+- Check if typo, fix if so
+- Otherwise remove from PR
+
+**No tickets at all**:
 ```
 Use AskUserQuestion:
-- Header: "New Ticket"
-- Question: "File {file} doesn't fit any ticket. Create one?"
+- Header: "No Ticket"
+- Question: "No ticket found for this work. What should we do?"
 - Options:
-  - "Create ticket for: {suggested description}"
-  - "Add to existing ticket: {primary_ticket}"
-  - "Skip (leave undocumented)"
+  - "Create new ticket: {suggested description}"
+  - "Link to existing ticket: {enter ticket ID}"
 ```
-
-If creating ticket:
-1. Create `issues/{NEW-TICKET}.md` with summary
-2. Create ticket in Linear via MCP
-3. Add to PR's Linear Tickets table
-
-**Option C: Expected change (infra/config)**
-For infrastructure, config, or CI files that don't need formal tickets:
-- Add to Key Changes with description "Infrastructure/Configuration"
-- Use primary ticket or "N/A" as ticket reference
 
 ### Phase 4: Build Updated PR Body
 
-Construct the complete PR body following this structure:
+Construct the PR body following this structure:
 
 ```markdown
 # {PRIMARY-TICKET}: {Title}
@@ -129,7 +119,7 @@ One sentence describing the change.
 ## Product Requirements
 
 ### Summary
-{From issues/{TICKET}.md}
+{From issues/{TICKET}.md or Linear description}
 
 ### Acceptance Criteria
 | # | Criterion | Status | Verification |
@@ -140,11 +130,14 @@ One sentence describing the change.
 
 ## Technical Implementation
 
-### Key Changes
-| File | Change | Ticket | Description |
-|------|--------|--------|-------------|
-| `path/to/file.py` | Modified | {TICKET} | What it does |
-| `path/to/new.py` | Added | {TICKET} | What it does |
+### Changed Files
+| File | Change | Description |
+|------|--------|-------------|
+| `path/to/file.py` | Modified | What it does |
+
+### Notable Decisions
+- **Decision**: {What was decided}
+- **Rationale**: {Why}
 
 ---
 
@@ -152,13 +145,14 @@ One sentence describing the change.
 | Type | Status | Details |
 |------|--------|---------|
 | Unit | Passed | X tests |
-| Integration | Passed | Pipeline verified |
 
 ---
 
 ## Audit Trail
-- All changes documented and linked to tickets
+- All changes linked to tickets
 ```
+
+**Note**: The "Changed Files" table is optional and for documentation purposes only. It is NOT required for SOC2 compliance. What matters is the Linear Tickets table.
 
 ### Phase 5: Update PR
 
@@ -174,56 +168,41 @@ gh pr edit {number} --body-file /tmp/pr_body.md
 
 ### Phase 6: Verify Fix
 
-Wait for CI to re-run, or manually verify:
-- Every changed file appears in Key Changes table
-- Every ticket in Key Changes exists in Linear Tickets table
+The compliance check will pass when:
+- Every ticket in PR exists in Linear
 - No orphan tickets (listed but no code)
-
-## Quick Fix Mode
-
-If called with `--files` parameter, skip analysis and just add those files:
-
-```bash
-/fix-compliance --files "web/api.py,algo/process.py"
-```
-
-This will:
-1. Read current PR body
-2. Add specified files to Key Changes table
-3. Use primary ticket from PR
-4. Update PR
+- No merge commit tickets included
 
 ## Examples
 
-### Example 1: Undocumented files
+### Example 1: Missing ticket in PR
 ```
-SOC2 check failed: web/backoffice/middleware.py not in PR description
+SOC2 check failed: PROJ-407 found in commits but not in PR description
 
 /fix-compliance
-→ Adds middleware.py to Key Changes table
+→ Adds PROJ-407 to Linear Tickets table
 → Updates PR
 → CI re-runs and passes
 ```
 
-### Example 2: Inherited tickets
+### Example 2: Inherited tickets from merge
 ```
-SOC2 check failed: BOL-335 has no code changes (from merge commit)
+SOC2 check failed: PROJ-335 has no code changes (from merge commit)
 
 /fix-compliance
-→ Detects BOL-335 came from merging staging
+→ Detects PROJ-335 came from merging staging
 → Removes from Linear Tickets table
 → Updates PR
 ```
 
-### Example 3: New unrelated work
+### Example 3: Invalid ticket
 ```
-SOC2 check failed: infra/terraform/cloud-run.tf not documented
+SOC2 check failed: PROJ-999 not found in Linear
 
 /fix-compliance
-→ Detects terraform changes aren't covered by any ticket
-→ Asks: "Create ticket for Terraform Cloud Run config?"
-→ User: "Add to BOL-407"
-→ Adds to Key Changes with BOL-407
+→ Checks if typo (PROJ-399?)
+→ Asks user to confirm
+→ Fixes or removes
 → Updates PR
 ```
 
