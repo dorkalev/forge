@@ -408,12 +408,42 @@ This will:
 
 3. Update PR description with Linear issue table
 
-4. Add PR link to Linear issue:
+4. **Refine PR title to express the essence** (not just "what was done"):
+
+   Analyze the diff and ask: "What is the core outcome or insight of this change?"
+
+   **Bad titles** (describe actions):
+   - "Delete tfvars files, use GitHub Environment variables"
+   - "Add validation, fix bug, update docs"
+   - "Refactor auth module and add tests"
+
+   **Good titles** (express essence):
+   - "Make GitHub Environments the single source of truth for Terraform"
+   - "Prevent duplicate payments by validating idempotency keys"
+   - "Enable offline mode for mobile users"
+
+   The title should answer: **"What does the codebase now do/have that it didn't before?"** or **"What problem is now solved?"**
+
+   Present the suggested title to the user:
+   ```
+   Current PR title: {current}
+
+   Suggested essence-based title: {suggested}
+
+   Options:
+   [A] Accept suggested title
+   [K] Keep current title
+   [E] Edit (type your own)
+   ```
+
+   Update with: `gh pr edit <pr-number> --title "<new-title>"`
+
+5. Add PR link to Linear issue:
    ```
    linear_create_comment(issueId: "<id>", body: "PR: <url>")
    ```
 
-5. Update Linear issue state to "In Review":
+6. Update Linear issue state to "In Review":
    ```
    linear_update_issue(issueId: "<id>", status: "In Review")
    ```
