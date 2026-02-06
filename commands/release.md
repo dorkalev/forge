@@ -341,14 +341,17 @@ git pull origin compliance-archives
 # Create releases directory if needed
 mkdir -p releases
 
-# Write release file
-RELEASE_FILE="releases/release-$(date +%Y-%m-%d)-$(date +%H%M%S).json"
-cat > "$RELEASE_FILE" << 'EOF'
+# Write release JSON file
+RELEASE_BASENAME="release-$(date +%Y-%m-%d)-$(date +%H%M%S)"
+RELEASE_JSON="releases/${RELEASE_BASENAME}.json"
+RELEASE_MD="releases/${RELEASE_BASENAME}.md"
+
+cat > "$RELEASE_JSON" << 'EOF'
 {release JSON}
 EOF
 
 # Commit and push
-git add "$RELEASE_FILE"
+git add "$RELEASE_JSON" "$RELEASE_MD"
 git commit -m "release: $(date +%Y-%m-%d) - {N} PRs, {N} tickets"
 git push origin compliance-archives
 
@@ -356,6 +359,75 @@ git push origin compliance-archives
 cd -
 git worktree remove /tmp/compliance-archives
 ```
+
+#### 5.2.1: Generate Release Markdown Report
+
+Create a human-readable Markdown report alongside the JSON:
+
+```markdown
+# Release: {YYYY-MM-DD}
+
+> Released by: {git user.name}
+> Released at: {ISO8601 timestamp}
+
+## Summary
+
+| Metric | Value |
+|--------|-------|
+| **Commits** | {N} |
+| **Pull Requests** | {N} |
+| **Linear Tickets** | {N} |
+| **Files Changed** | {N} (+{insertions}/-{deletions}) |
+
+## From → To
+
+- **From**: `main` @ `{short SHA before}`
+- **To**: `staging` @ `{short SHA}`
+
+## Pull Requests Included
+
+| PR | Title | Author | Merged | Compliance Archive |
+|----|-------|--------|--------|-------------------|
+| [#108]({url}) | BOL-407: Session auth... | @dorkalev | 2026-02-04 | [📋 Report]({archive_url}) |
+| [#106]({url}) | BOL-396: Simplify velocity... | @dorkalev | 2026-02-03 | [📋 Report]({archive_url}) |
+
+## Linear Tickets
+
+| Ticket | Title | Status |
+|--------|-------|--------|
+| [BOL-407]({linear_url}) | Session auth for browser API | Done |
+| [BOL-396]({linear_url}) | Simplify velocity RMS | Done |
+
+## Changes by Area
+
+### Web Dashboard
+- Session authentication for browser API endpoints
+- Custom 404 and 500 error pages
+
+### Algorithm Service
+- Simplified velocity RMS calculations
+- Zero-padding for clean FFT bins
+
+### Infrastructure
+- Compliance archives on dedicated branch
+
+## CI Status
+
+All checks passed on staging before release.
+
+| Check | Status |
+|-------|--------|
+| algo-test | ✅ passed |
+| web-test | ✅ passed |
+| soc2-compliance | ✅ passed |
+
+## Confirmation
+
+- **Word presented**: {RANDOM_WORD}
+- **Confirmed at**: {ISO8601}
+```
+
+Write this to `$RELEASE_MD` before committing.
 
 #### 5.3: Fast-Forward Main to Staging
 
