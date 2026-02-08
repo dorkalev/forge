@@ -1,129 +1,57 @@
 ---
 description: Create a Linear issue from planning discussion and save issue/spec files
 ---
-
 # /capture - Turn Planning Discussion into a Linear Issue
 
-You are an expert at formalizing planning discussions into structured product requirements and technical specifications.
+**Prerequisites**: Linear MCP configured in `.mcp.json`
 
-**Prerequisites**: Linear MCP server must be configured in `.mcp.json`
-
-## Usage
-
-```
-/capture
-```
-
-Run this after discussing and planning a feature in the conversation.
-
-## Workflow
+Run after discussing and planning a feature in the conversation.
 
 ### Phase 1: Extract Planning Context
+Review conversation to identify: feature name/title, product requirements (WHAT & WHY), technical spec (HOW).
 
-Review the conversation to identify:
-- **Feature name/title**: Clear, concise name
-- **Product requirements**: User stories, acceptance criteria (WHAT & WHY)
-- **Technical spec**: Architecture, implementation details (HOW)
-
-### Phase 2: Prompt User for Metadata
-
-Use `AskUserQuestion`:
-1. **Priority**: Urgent, High, Medium, Low, None
-2. **Labels**: Any labels to apply? (comma-separated or "none")
+### Phase 2: Prompt for Metadata
+AskUserQuestion: Priority (Urgent/High/Medium/Low/None), Labels (comma-separated or "none").
 
 ### Phase 3: Create Linear Issue
-
-Use Linear MCP to create the issue:
-```
-linear_create_issue(
-  title: "<feature title>",
-  description: "<product description in markdown>",
-  teamId: "<team ID>",
-  priority: <0-4>
-)
-```
-
-Priority mapping: 0=None, 1=Urgent, 2=High, 3=Medium, 4=Low
+`linear_create_issue(title, description, teamId, priority)` — Priority: 0=None, 1=Urgent, 2=High, 3=Medium, 4=Low.
 
 ### Phase 4: Save Product Requirements
-
 Create `issues/{ISSUE_ID}-{number}.md`:
 ```markdown
 # {ISSUE_ID}-{number}: {Title}
-
-**Priority:** {Priority}
-**State:** Backlog
-**URL:** {issue_url}
-
+**Priority:** {Priority}  **State:** Backlog  **URL:** {url}
 ## Summary
 {2-3 sentence business description}
-
 ## User Stories
 - As a {role}, I want {feature} so that {benefit}
-
 ## Acceptance Criteria
-- [ ] {Criterion 1}
-- [ ] {Criterion 2}
-
+- [ ] {Criteria}
 ## Business Rules
-- {Rule 1}
-
+- {Rules}
 ## Out of Scope
-- {What this feature does NOT include}
+- {Exclusions}
 ```
-
-**DO NOT include**: File paths, code snippets, architecture details.
+DO NOT include file paths, code snippets, or architecture details.
 
 ### Phase 5: Save Technical Spec
-
 Create `specs/{issue}-{number}-{feature-name}.md`:
 ```markdown
-# {ISSUE_ID}-{number}: {Title} - Technical Spec
-
-> See [{ISSUE_ID}-{number}](../issues/{ISSUE_ID}-{number}.md) for product requirements.
-
+# {ISSUE-ID}: {Title} - Technical Spec
+> See [{ISSUE-ID}](../issues/{ISSUE-ID}.md) for product requirements.
 ## Overview
-{High-level technical summary}
-
 ## Architecture
-{System design, data flow}
-
 ## Implementation Plan
-
-### 1. {First task}
-- Files: `path/to/file.py`
-- Changes: {what changes}
-
+### 1. {Task} — Files: `path`, Changes: {what}
 ## Edge Cases & Error Handling
-- {Edge case 1}: {How handled}
-
 ## Testing Strategy
-- {How to verify}
-
 ## Open Questions
-- [ ] {Unresolved questions}
 ```
 
-### Phase 6: Output Summary
-
-```
-## Created: {ISSUE_ID}-{number}: {Title}
-
-**Linear issue**: {issue_url}
-
-**Files saved**:
-- `issues/{ISSUE_ID}-{number}.md` - Product requirements
-- `specs/{issue}-{number}-{feature-name}.md` - Technical specification
-
-**Next steps**:
-- Create branch: `git checkout -b {issue}-{number}-{feature-name}`
-- Or use `/start` to set up the full dev environment
-
-Ready to implement!
-```
+### Phase 6: Output
+Report: Linear issue URL, files saved (issues/ and specs/), next steps (create branch or `/start`).
 
 ## Error Handling
-
-- **Linear MCP not available**: Report error, ask user to configure `.mcp.json`
-- **No clear feature in conversation**: Ask user to clarify
-- **Issue creation fails**: Do not create local files, report the error
+- **Linear MCP not available**: ask user to configure `.mcp.json`
+- **No clear feature**: ask user to clarify
+- **Issue creation fails**: don't create local files, report error
