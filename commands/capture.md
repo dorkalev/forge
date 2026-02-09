@@ -16,6 +16,8 @@ AskUserQuestion: Priority (Urgent/High/Medium/Low/None), Labels (comma-separated
 ### Phase 3: Create Linear Issue
 `linear_create_issue(title, description, teamId, priority)` — Priority: 0=None, 1=Urgent, 2=High, 3=Medium, 4=Low.
 
+**CRITICAL**: Extract `ISSUE_ID` and `URL` from the API response. Use ONLY the returned identifier — NEVER fabricate or guess an issue ID. Do NOT proceed to Phase 4 until the issue exists in Linear.
+
 ### Phase 4: Save Product Requirements
 Create `issues/{ISSUE_ID}-{number}.md`:
 ```markdown

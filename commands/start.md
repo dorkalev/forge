@@ -14,7 +14,7 @@ WORKTREE_BASE_PATH=$(grep '^WORKTREE_BASE_PATH=' .forge | cut -d= -f2)
 
 **Otherwise**, `linear_get_user_issues(limit: 100)`, sort by priority (1=urgent → 4=low), display as `| ID | Title | Priority | State |` table. AskUserQuestion — Header: "Issue", Question: "Enter issue ID or description for new issue", Options: "PROJ-XXX" and "New issue".
 - Matches `^PROJ-\d+$` or `^\d+$` → fetch that issue
-- Otherwise → create via `linear_create_issue`, optionally improve spec with AI first
+- Otherwise → this is a new issue description. Optionally improve spec with AI first. Then call `linear_create_issue` and **extract the identifier from the API response** (e.g., `BOL-123`). Use ONLY this returned identifier for all subsequent steps — NEVER fabricate or guess an issue ID.
 
 ### Create Branch
 1. Name: `{identifier}-{slugified-title}` (max 50 chars). **No prefix** — starts with issue identifier.

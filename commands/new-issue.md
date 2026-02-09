@@ -24,6 +24,8 @@ AskUserQuestion — Header: "Spec", Options: "Create as-is", "Improve with AI" (
 **As-is**: Create via Linear MCP with description as title and body.
 **Improve with AI**: Brief research (1-2 grep/glob searches), expand into Summary + Requirements + Acceptance Criteria. Then create.
 
+**CRITICAL**: Extract `IDENTIFIER`, `TITLE`, `URL`, and `DESCRIPTION` from the `linear_create_issue` response. Use ONLY the returned identifier — NEVER fabricate or guess an issue ID. Do NOT proceed to Step 5 until the issue is created and you have the real identifier.
+
 ### Step 5: Create Branch
 ```bash
 cd "${WORKTREE_REPO_PATH}"
