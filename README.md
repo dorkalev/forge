@@ -96,6 +96,33 @@ your-project/
     └── proj-123-feature.md
 ```
 
+
+## Codex Support
+
+Forge now includes a Codex skill package at `skills/forge-workflow` so the same workflow can be used in Codex.
+
+### Install Locally
+
+```bash
+mkdir -p ~/.codex/skills
+cp -R skills/forge-workflow ~/.codex/skills/
+```
+
+Restart Codex after installation.
+
+### Install via Skill Installer (after pushing repo)
+
+```bash
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py   --repo dorkalev/forge   --path skills/forge-workflow
+```
+
+### Usage
+
+Ask Codex to use `forge-workflow` and then request a Forge action, for example:
+- "Use forge-workflow and run start for BOL-420"
+- "Use forge-workflow and run finish"
+- "Use forge-workflow and run fix-pr"
+
 ## License
 
 MIT
