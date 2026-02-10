@@ -21,7 +21,7 @@ gh pr list --head "$BRANCH" --base staging --json number,url,title,body
 ```
 If no PR: `No PR found. Run /forge:pr first.`
 
-**1.2** Extract tickets from non-merge commits: `git log staging..HEAD --no-merges --format="%s%n%b"`. Read `.forge` for `LINEAR_PROJECTS`. Build regex patterns dynamically. Extract unique ticket IDs.
+**1.2** Extract tickets from non-merge commits on this branch only: `git log staging..HEAD --no-merges --first-parent --format="%s%n%b"`. Read `.forge` for `LINEAR_PROJECTS`. Build regex patterns dynamically. Extract unique ticket IDs. **IMPORTANT:** `--first-parent` excludes commits inherited from merging origin/staging — only commits authored on this branch are considered.
 
 **1.3** Read `issues/{TICKET_ID}.md` (Summary, Acceptance Criteria, Out of Scope). If missing, `linear_get_issue(id)`.
 
@@ -31,13 +31,13 @@ If no PR: `No PR found. Run /forge:pr first.`
 
 **1.6: MANDATORY Ticket Traceability Check (BLOCKING)**
 ```bash
-COMMITS_TICKETS=$(git log staging..HEAD --no-merges --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
+COMMITS_TICKETS=$(git log staging..HEAD --no-merges --first-parent --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
 PR_BODY=$(gh pr view --json body -q '.body')
 PR_TICKETS=$(echo "$PR_BODY" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
 MISSING_FROM_PR=$(comm -23 <(echo "$COMMITS_TICKETS") <(echo "$PR_TICKETS"))
 EXTRA_IN_PR=$(comm -13 <(echo "$COMMITS_TICKETS") <(echo "$PR_TICKETS"))
 ```
-Check untracked commits: `git log staging..HEAD --oneline | grep -v "[A-Z]\+-[0-9]\+" | grep -v "^[a-f0-9]* Merge"`
+Check untracked commits: `git log staging..HEAD --first-parent --oneline | grep -v "[A-Z]\+-[0-9]\+" | grep -v "^[a-f0-9]* Merge"`
 
 **If discrepancies**: AskUserQuestion — Header: "Compliance", Options: "Add missing tickets to PR" (recommended), "From merge commits - note in audit trail", "Create tickets for untracked commits", "Abort". **Do NOT proceed until resolved.**
 
