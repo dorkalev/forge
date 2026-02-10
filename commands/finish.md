@@ -27,7 +27,7 @@ Documentation: `issues/` = Product (WHAT & WHY, no code), `specs/` = Technical (
 ### Phase 1: Discovery & Analysis
 Get branch name, locate `issues/` file, parse requirements, analyze all changes:
 ```bash
-git log staging..HEAD --oneline
+git log staging..HEAD --first-parent --oneline
 git diff staging...HEAD --stat
 git status --short
 git diff --stat          # unstaged
