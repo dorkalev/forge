@@ -9,14 +9,14 @@ Generates PDF, MP3, MP4 from markdown files or ticket diffs.
 
 ```
 /release-media <markdown-file> [options]
-/release-media --tickets BOL-123,BOL-456 [options]
+/release-media --tickets PROJ-123,PROJ-456 [options]
 ```
 
 **Options**: `--title "Title"`, `--image <path>` (for MP4), `--audio-only`, `--pdf-only`, `--voice <voice-id>` (default: en-US-Journey-D), `--output-dir <path>`, `--base <branch>` (default: staging), `--folders <paths>`
 
 ## Ticket Mode (--tickets)
 
-**T1** Resolve branches: `git branch -a | grep -i "BOL-123"` or Linear MCP.
+**T1** Resolve branches: `git branch -a | grep -i "PROJ-123"` or Linear MCP.
 **T2** Get diff: `git diff $BASE...$TICKET_BRANCH --stat -- $FOLDERS`
 **T3** Analyze changes using Task/Explore agent: components changed, product impact, new data models, new APIs, infrastructure changes.
 **T4** Generate markdown with: Title/Overview, Architecture Diagrams (Mermaid), Data Model Diagrams (Mermaid ERD), Component Diagrams (Mermaid flowchart), Product Description (6-8 paragraphs, audio-friendly: no "click here"/"see below", spell out acronyms, avoid jargon, focus on user value).

@@ -56,7 +56,7 @@ gh pr view --json body,number,title -q '.'
 ```
 Tickets from this branch's own commits: `git log staging..HEAD --no-merges --first-parent --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u`
 Tickets inherited from merging staging (should NOT be in PR): compare `git log staging..HEAD --no-merges` vs `git log staging..HEAD --no-merges --first-parent` — any commits in the first but not the second came from staging merges. Extract their tickets to exclude.
-**IMPORTANT:** `--first-parent` ensures only commits authored on this branch are included. Without it, merging origin/staging pulls in all staging commits (e.g., BOL-449, BOL-452) and pollutes the ticket list.
+**IMPORTANT:** `--first-parent` ensures only commits authored on this branch are included. Without it, merging origin/staging pulls in all staging commits (e.g., PROJ-449, PROJ-452) and pollutes the ticket list.
 Parse current PR Linear Tickets table.
 
 ### Phase 2: Identify Gaps

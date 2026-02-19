@@ -8,7 +8,7 @@ description: Fetch Linear issue, save requirements, and create technical impleme
 ```
 /load <id>
 /load 277
-/load ENG-277
+/load PROJ-277
 ```
 
 ### Phase 1: Setup

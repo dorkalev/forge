@@ -10,7 +10,7 @@
 
 ## Branch Naming
 
-Branch names must follow the format: `BOL-{ID}-{description}` (e.g., `BOL-468-backoffice-v02`).
+Branch names must follow the format: `{ISSUE-ID}-{description}` (e.g., `PROJ-468-feature-v02`).
 Never prefix branches with `codex/`, `claude/`, or any AI tool name. Just the ticket ID and a short description.
 
 ## When Making Changes
