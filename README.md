@@ -1,12 +1,36 @@
 # Forge
 
-A Claude Code plugin with commands for Linear-integrated development workflows.
+Forge workflows for both Claude Code plugin commands and a Codex skill.
 
-## Installation
+## Claude Plugin Installation
 
 ```bash
 /plugin install forge@dorkalev/forge
 ```
+
+## Codex Skill Installation
+
+This repo now ships a Codex skill at `skills/forge-workflow`.
+
+Install:
+
+```bash
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo dorkalev/forge \
+  --path skills/forge-workflow
+```
+
+Update after new pushes:
+
+```bash
+rm -rf ~/.codex/skills/forge-workflow
+python ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo dorkalev/forge \
+  --path skills/forge-workflow \
+  --ref main
+```
+
+Restart Codex after install/update to pick up changes.
 
 ## Prerequisites
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Forge Workflow"
+  short_description: "Help with Forge Workflow tasks"
+  default_prompt: "Use $forge-workflow to execute a Forge command workflow in this repository."
