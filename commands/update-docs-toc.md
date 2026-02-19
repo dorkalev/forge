@@ -24,12 +24,12 @@ Generate a `## Documentation` section with grouped links:
 ## Documentation
 
 ### Issues
-- [ENG-123](issues/ENG-123.md) — Brief title from first heading or filename
-- [ENG-456](issues/ENG-456.md) — Brief title
+- [PROJ-123](issues/PROJ-123.md) — Brief title from first heading or filename
+- [PROJ-456](issues/PROJ-456.md) — Brief title
 
 ### Specs
-- [backoffice](specs/backoffice.md) — Brief title
-- [eng-477](specs/eng-477.md) — Brief title
+- [feature-module](specs/feature-module.md) — Brief title
+- [proj-477](specs/proj-477.md) — Brief title
 
 ### Docs
 - [UUID Format Standard](docs/UUID_FORMAT_STANDARD.md) — Brief title
