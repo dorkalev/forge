@@ -2,11 +2,16 @@
 
 ## Commit & PR Rules
 
-**NEVER credit Claude Code in commits or PRs.** This means:
+**NEVER credit Claude Code, Codex, or any AI tool in commits or PRs.** This means:
 - No `Co-Authored-By: Claude` or similar trailers
-- No mentions of "Claude", "Anthropic", or "AI-generated" in commit messages
+- No mentions of "Claude", "Codex", "Anthropic", or "AI-generated" in commit messages
 - No AI credits in PR descriptions or bodies
 - Keep commits looking like normal developer commits
+
+## Branch Naming
+
+Branch names must follow the format: `BOL-{ID}-{description}` (e.g., `BOL-468-backoffice-v02`).
+Never prefix branches with `codex/`, `claude/`, or any AI tool name. Just the ticket ID and a short description.
 
 ## When Making Changes
 
