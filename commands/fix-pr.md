@@ -1,24 +1,31 @@
 ---
-description: Fix CodeRabbit findings from GitHub PR
+description: Fix CodeRabbit, Greptile, and Aikido findings from GitHub PR
 ---
-# /fix-pr - Fix CodeRabbit Findings
+# /fix-pr - Fix PR Review Findings
 
-Fetch CodeRabbit review comments from GitHub PR and fix Major/Critical issues in a loop.
+Fetch review comments from CodeRabbit, Greptile, and Aikido on the GitHub PR and fix Major/Critical issues in a loop.
 
-**Prerequisites**: GitHub token in `.forge`, CodeRabbit enabled on repo.
+**Prerequisites**: GitHub token in `.forge`, review bots enabled on repo.
 
 ### Phase 1: Setup
 1. `git branch --show-current`
 2. Find PR: `gh pr list --head {owner}:{branch} --base staging --json number,url`
 
-### Phase 2: Fetch CodeRabbit Comments
+### Phase 2: Fetch Review Comments
 ```bash
-# Inline review comments
+# Inline review comments (all bots)
 gh api repos/{owner}/{repo}/pulls/{pr-number}/comments
 # Issue comments (main thread)
 gh api repos/{owner}/{repo}/issues/{pr-number}/comments
 ```
-Filter `coderabbitai[bot]`. Severity: `_Critical_`/`**Critical**` and `_Major_`/`**Major**`/`Potential issue` → MUST fix. `_Minor_`/`_Trivial_`/`Nitpick` → skip. If none found, report success and exit.
+Filter by bot login: `coderabbitai[bot]`, `greptile-apps[bot]`, `aikido-pr-checks[bot]`.
+
+**Severity classification:**
+- **CodeRabbit**: `_Critical_`/`**Critical**` and `_Major_`/`**Major**`/`Potential issue` → MUST fix. `_Minor_`/`_Trivial_`/`Nitpick` → skip.
+- **Greptile**: All findings are treated as Major (no severity labels) → MUST evaluate. Fix if valid, reply with explanation if not.
+- **Aikido**: `medium severity` and above → MUST evaluate. Fix if valid, acknowledge if repo-wide concern.
+
+If no actionable findings, report success and exit.
 
 ### Phase 3: Fix Issues
 
@@ -33,7 +40,7 @@ Ask user — Options: [A] Acknowledge (keep, reply explaining), [F] Fix it, [S] 
 ### Phase 4: Commit and Push
 ```bash
 git add -A
-git commit -m "fix: address CodeRabbit findings
+git commit -m "fix: address PR review findings
 
 - [list each fix]"
 git push
@@ -60,7 +67,7 @@ gh pr view {pr-number} --json comments \
   --jq '.comments | map(select(.author.login == "coderabbitai")) | .[-1].body' \
   | grep -q "Currently processing"
 ```
-Once done, re-fetch comments. **Repeat entire workflow** if new Critical/Major issues found.
+Once done, re-fetch comments from all three bots. **Repeat entire workflow** if new Critical/Major issues found.
 
 ## Stopping
 Loop stops when: no Major/Critical remain, user types "stop", or GitHub API errors after 3 retries.
