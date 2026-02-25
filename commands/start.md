@@ -88,7 +88,7 @@ FOLDER_NAME=$(basename "${WORKTREE_PATH}")
 tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
 tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
 tmux set-option -t "${SESSION_NAME}" status-left-length 50
-tmux send-keys -t "${SESSION_NAME}" "unset CLAUDE_CODE_ENTRYPOINT && claude" Enter
+tmux send-keys -t "${SESSION_NAME}" "unset CLAUDECODE && claude" Enter
 sleep 3
 tmux send-keys -t "${SESSION_NAME}" "/forge:load ${IDENTIFIER}" Enter
 
