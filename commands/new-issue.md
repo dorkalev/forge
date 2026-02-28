@@ -3,7 +3,7 @@ description: Create a new Linear issue from a description and set up the full de
 ---
 # /new-issue - Quick Issue Creation
 
-Create a new Linear issue and set up full dev environment (branch, PR, worktree, tmux). Execute steps 1-10 sequentially — do NOT enter plan mode or start implementing. This skill's ONLY job is to create the issue + dev environment; the NEW Claude instance in the worktree handles all planning/implementation via `/forge:load`.
+Create a new Linear issue and set up full dev environment (branch, PR, worktree, tmux). Execute steps 1-10 sequentially — do NOT enter plan mode or start implementing. This skill's ONLY job is to create the issue + dev environment; the NEW Claude or Codex instance in the worktree handles all planning/implementation via `/forge:load`.
 
 **Prerequisites**: Linear MCP configured in `.mcp.json`
 
@@ -69,7 +69,8 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 10: Open Tmux with Claude
+### Step 10: Open Tmux with Claude or Codex
+For Codex App users: replace claude with codex in the tmux launch step and run the same /load command.
 ```bash
 SESSION_NAME="${BRANCH_NAME}"
 FOLDER_NAME=$(basename "${WORKTREE_PATH}")
