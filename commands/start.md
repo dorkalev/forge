@@ -47,14 +47,13 @@ WORKTREE_BASE_PATH=$(grep '^WORKTREE_BASE_PATH=' .forge | cut -d= -f2)
    git push -u origin "${BRANCH_NAME}"
    ```
 
-### Create Draft PR
+### Ensure Draft PR Exists
 ```bash
-gh pr create \
-  --draft \
-  --head "${BRANCH_NAME}" \
-  --base staging \
-  --title "${IDENTIFIER}: ${TITLE}" \
-  --body "## Linear Tickets
+PR_URL=$(gh pr list --head "${BRANCH_NAME}" --base staging --json url --jq '.[0].url // empty')
+
+if [[ -z "${PR_URL}" ]]; then
+  cat > /tmp/forge_pr_body.md <<EOF
+## Linear Tickets
 
 | Ticket | Title | Status |
 |--------|-------|--------|
@@ -65,7 +64,20 @@ gh pr create \
 ${DESCRIPTION}
 
 ---
-*Run \`/forge:finish\` to build comprehensive compliance document.*"
+*Run /forge:finish to build comprehensive compliance document.*
+EOF
+
+  gh pr create \
+    --draft \
+    --head "${BRANCH_NAME}" \
+    --base staging \
+    --title "${IDENTIFIER}: ${TITLE}" \
+    --body-file /tmp/forge_pr_body.md
+
+  PR_URL=$(gh pr list --head "${BRANCH_NAME}" --base staging --json url --jq '.[0].url // empty')
+else
+  echo "PR already exists: ${PR_URL}"
+fi
 ```
 
 ### Create Worktree
