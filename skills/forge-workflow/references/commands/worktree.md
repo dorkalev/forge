@@ -33,7 +33,8 @@ ln -sf "${WORKTREE_REPO_PATH}/.forge" "${WORKTREE_PATH}/.forge"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 6: Open Tmux with Claude in iTerm
+### Step 6: Open Tmux with Claude or Codex in iTerm
+For Codex App users: replace claude with codex in the tmux launch step and run the same /load command.
 ```bash
 ISSUE_ID=$(echo "${BRANCH_NAME}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
 SESSION_NAME="${BRANCH_NAME}"
@@ -56,9 +57,9 @@ tell application \"iTerm\"
 end tell
 "
 ```
-If no issue ID in branch name, just create worktree without Claude auto-prompt.
+If no issue ID in branch name, just create worktree without an automatic agent prompt.
 
 **Output**: Report Branch, Worktree path, Tmux session.
 
 ## Error Handling
-- Branch not found → list matching branches | Worktree exists → report path, ask to open | No issue ID → skip Claude auto-prompt
+- Branch not found → list matching branches | Worktree exists → report path, ask to open | No issue ID → skip automatic agent prompt

@@ -1,5 +1,5 @@
 ---
-description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and opens Claude in tmux with the issue.
+description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and opens Claude/Codex in tmux with the issue.
 ---
 # /start - Start Working on a Linear Issue
 
@@ -81,6 +81,7 @@ cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || 
 ```
 
 ### Update Linear & Open Tmux
+For Codex App users: replace claude with codex in the tmux launch step and run the same /forge:load command.
 Move to "In Progress": `linear_update_issue(issueId: "<id>", status: "In Progress")`
 ```bash
 SESSION_NAME="${IDENTIFIER}"

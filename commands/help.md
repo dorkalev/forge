@@ -11,7 +11,7 @@ If user runs `/forge:help <command>`, show detailed help for that command:
 ```
 /forge:start [issue-id] - Start Working on a Linear Issue
 Shows assigned issues (or fetches by ID), creates branch from staging,
-draft PR, worktree, opens tmux with Claude, runs /forge:load.
+draft PR, worktree, opens tmux with Claude or Codex, runs /forge:load.
 ```
 
 ### /forge:help finish
@@ -108,7 +108,7 @@ staging, creates compliance archive, updates Linear.
 `/forge:tile` - Tiles all tmux sessions into a single iTerm window with split panes (auto grid layout).
 
 ### /forge:help worktree
-`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, opens tmux+Claude.
+`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, opens tmux+Claude or Codex.
 
 ### /forge:help pr
 `/forge:pr` - Opens PR in browser, or creates one if missing (draft/ready, auto-populates from Linear).
