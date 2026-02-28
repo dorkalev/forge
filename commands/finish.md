@@ -60,7 +60,7 @@ Ensure alignment between **Linear ticket** (authoritative), **`issues/`**, **`sp
 ### Phase 4: Issue & Spec File Management
 Update `issues/{ISSUE_ID}.md` (`- [ ]` → `- [x]`, product-focused), sync to Linear via `linear_update_issue` (Summary, Acceptance Criteria, Out of Scope), update `specs/{feature-name}.md`.
 
-Then run `/forge:update-docs-toc` to update the `## Documentation` section in CLAUDE.md and ensure the `agents.md` symlink exists.
+Then run `/forge:update-domain-docs` to refresh any domain docs affected by code changes, and `/forge:update-docs-toc` to update the `## Documentation` section in CLAUDE.md and ensure the `agents.md` symlink exists.
 
 ### Phase 5: Commit Changes
 ```bash

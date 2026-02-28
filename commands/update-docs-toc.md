@@ -3,16 +3,14 @@ description: Update CLAUDE.md with a table of contents linking all project docum
 ---
 # /update-docs-toc - Update Documentation Table of Contents
 
-Scan the project for markdown documentation files and update CLAUDE.md with a `## Documentation` section that links to all of them. Also ensure `agents.md` is a symlink to `CLAUDE.md`.
+Scan the project for markdown documentation files and update CLAUDE.md with a `## Documentation` section. Also ensure `agents.md` is a symlink to `CLAUDE.md`.
 
 ## Process
 
 ### Step 1: Scan for documentation files
 
 Search the project root for markdown files in these directories (if they exist):
-- `issues/` — Product requirements (from Linear)
-- `specs/` — Technical specifications
-- `docs/` — General documentation
+- `docs/` — Domain docs and reference docs
 
 Also include any top-level `.md` files that are NOT `CLAUDE.md`, `agents.md`, `README.md`, or `CHANGELOG.md`.
 
@@ -23,23 +21,27 @@ Generate a `## Documentation` section with grouped links:
 ```markdown
 ## Documentation
 
-### Issues
-- [PROJ-123](issues/PROJ-123.md) — Brief title from first heading or filename
-- [PROJ-456](issues/PROJ-456.md) — Brief title
+### Domain Docs (current truth — read these first)
+- [Product Overview](docs/product.md) — Brief title
+- [Architecture](docs/architecture.md) — Brief title
+- [Auth & Multi-Tenancy](docs/auth.md) — Brief title
+- [Data Pipeline](docs/data-pipeline.md) — Brief title
+- [Data Model](docs/data-model.md) — Brief title
+- [Deployment](docs/deploy.md) — Brief title
 
-### Specs
-- [feature-module](specs/feature-module.md) — Brief title
-- [proj-477](specs/proj-477.md) — Brief title
-
-### Docs
-- [UUID Format Standard](docs/UUID_FORMAT_STANDARD.md) — Brief title
+### Reference Docs
 - [Database Admin](docs/DATABASE_ADMIN.md) — Brief title
+- [UUID Format Standard](docs/UUID_FORMAT_STANDARD.md) — Brief title
+
+### Ticket Docs
+Per-ticket product requirements in `issues/BOL-{ID}.md`, technical specs in `specs/bol-{id}-*.md`. Use `ls issues/ specs/` or glob to discover.
 ```
 
 **Rules:**
-- Extract the brief title from the first `#` heading in each file, or fall back to the filename
+- **Domain docs** are the 6 well-known files: `product.md`, `architecture.md`, `auth.md`, `data-pipeline.md`, `data-model.md`, `deploy.md`. List them first in a dedicated section if they exist.
+- **Reference docs** are all other `docs/*.md` files. Extract the brief title from the first `#` heading, or fall back to the filename.
+- **Ticket docs** are NOT individually listed. Just include a short note pointing to `issues/` and `specs/` directories.
 - Sort entries alphabetically within each group
-- Skip empty directories
 - Skip sections that would have zero entries
 - Preserve ALL existing content in CLAUDE.md that is NOT between `## Documentation` markers
 - If `## Documentation` section already exists, replace it entirely with the updated version
@@ -58,7 +60,8 @@ fi
 ### Step 4: Report
 
 Output what changed:
-- Number of docs found per category
+- Number of domain docs found
+- Number of reference docs found
 - Whether CLAUDE.md was updated
 - Whether agents.md symlink was created/updated
 
@@ -67,3 +70,4 @@ Output what changed:
 - This command is idempotent — running it multiple times produces the same result
 - It is automatically invoked during `/finish` (Phase 4)
 - The `## Documentation` section is machine-managed; manual edits to it will be overwritten
+- Individual `issues/` and `specs/` files are NOT listed — they are discoverable via glob
