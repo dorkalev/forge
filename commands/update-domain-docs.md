@@ -17,7 +17,7 @@ Review domain docs in `docs/` against code changes on the current branch and upd
 Map changed files to domain docs:
 
 ```bash
-git diff staging...HEAD --stat --name-only
+git diff origin/origin/staging..HEAD --stat --name-only
 ```
 
 | Changed files match | Domain doc |
@@ -36,7 +36,7 @@ If no domain docs are affected, report "No domain docs need updating" and exit.
 For each affected domain doc:
 
 1. Read the current doc content
-2. Read the relevant diffs (`git diff staging...HEAD -- <affected-files>`)
+2. Read the relevant diffs (`git diff origin/origin/staging..HEAD -- <affected-files>`)
 3. Determine if the doc needs updating:
    - **New features/services added** → add to doc
    - **Existing behavior changed** → update doc
