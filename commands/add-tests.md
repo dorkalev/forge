@@ -14,7 +14,7 @@ Read 2-3 existing tests to learn: file location, naming conventions, fixture/moc
 
 ## Step 2: Identify What Needs Tests
 ```bash
-git diff staging...HEAD --name-only
+git diff origin/origin/staging..HEAD --name-only
 git diff --name-only
 git diff --cached --name-only
 ```
