@@ -82,6 +82,17 @@ The compliance checker validates that every changed file in the diff is covered 
 ### For spec inconsistencies:
 - If the compliance checker says "spec says X but PR says Y" → update the spec to match current reality
 
+### For `missing_reviewers`:
+- The compliance comment shows `Missing: coderabbit` or similar under "Review issues"
+- This means the required reviewer hasn't posted a real review (e.g., CodeRabbit paused reviews)
+- **Auto-fix**: Post resume/review trigger comments on the PR:
+```bash
+gh pr comment {pr-number} --body "@coderabbitai resume"
+gh pr comment {pr-number} --body "@coderabbitai full review"
+```
+- For Greptile: `@greptile review`
+- After posting, tell the user to wait for the reviewer to complete and re-push or re-run compliance
+
 ### For acceptance criteria issues:
 - If acceptance criteria are unchecked in Linear → update the Linear ticket to check them off
 - If test plan items are wrong → update the PR body
