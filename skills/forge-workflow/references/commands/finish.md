@@ -53,6 +53,7 @@ Launch ALL of these in parallel (single message, multiple tool calls):
 2. **Update specs/ file** — reflect current implementation
 3. **`/forge:update-domain-docs`** — refresh domain docs affected by code changes (Task subagent)
 4. **`/forge:update-docs-toc`** — update CLAUDE.md documentation section (Task subagent)
+5. **`/forge:inspect-architecture`** — check architecture docs vs code, report-only mode (no interactive prompts). Checks system shape only: services, communication patterns, structural rules (not product, not implementation details). If FAIL findings exist, flag for user attention before proceeding.
 
 Wait for all to complete before proceeding.
 

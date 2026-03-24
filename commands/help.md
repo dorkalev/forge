@@ -131,6 +131,14 @@ staging, creates compliance archive, updates Linear.
 ### /forge:help codex
 `/forge:codex` - Opens Codex CLI in tmux/iTerm session.
 
+### /forge:help inspect-architecture
+```
+/forge:inspect-architecture - Architecture Drift Inspector
+Reads docs/architecture/*.md, extracts verifiable claims (file paths, services,
+configs, patterns), checks each against the codebase. Reports PASS/WARN/FAIL
+with mitigation prompts. Read-only — makes no changes.
+```
+
 ### /forge:help about
 `/forge:about` - How Forge makes SOC2 compliance a competitive advantage.
 
@@ -155,6 +163,7 @@ UTILITIES (not part of main workflow)
 /forge:verify-pr          Build comprehensive PR audit document (SOC2)
 /forge:fix-pr             Fix code review + CodeRabbit findings
 /forge:fix-compliance     Fix SOC2 compliance CI failures
+/forge:inspect-architecture  Check architecture docs vs code
 /forge:add-tests          Generate unit/integration tests
 /forge:release            Promote staging to production
 /forge:tmux-list          List tmux sessions and attach in iTerm

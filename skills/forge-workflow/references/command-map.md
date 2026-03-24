@@ -12,6 +12,7 @@ Use this map to choose the right Forge command spec quickly.
 - Fix PR bot findings (CodeRabbit/Greptile/Aikido): `references/commands/fix-pr.md`
 - Fix CI compliance failures: `references/commands/fix-compliance.md`
 - Compliance check (read-only): `references/commands/audit.md`
+- Architecture drift inspection: `references/commands/inspect-architecture.md`
 - PR compliance body build: `references/commands/verify-pr.md`
 - Document hotfix and backport: `references/commands/hotfix.md`
 - Release to production: `references/commands/release.md`
