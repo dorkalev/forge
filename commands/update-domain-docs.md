@@ -26,7 +26,7 @@ git diff origin/origin/staging..HEAD --stat --name-only
 | `algo/*`, `services/upload/local_pipeline.py`, `packages/data-access/*` | `docs/data-pipeline.md` |
 | `web/backoffice/models.py`, `web/alembic/*` | `docs/data-model.md` |
 | `infra/*`, `.github/workflows/*`, `**/Dockerfile`, `**/deploy*` | `docs/deploy.md` |
-| Service entrypoints, Dockerfiles, terraform, `packages/*` | `docs/architecture.md` |
+| Service entrypoints, Dockerfiles, terraform, `packages/*` | `docs/architecture/*.md` (split by topic — see `docs/architecture/overview.md` for index) |
 | `web/backoffice/routes.py`, `web/vlad/*`, `algo/analyst_agent/*`, UI components | `docs/product.md` |
 
 If no domain docs are affected, report "No domain docs need updating" and exit.

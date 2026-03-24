@@ -23,6 +23,7 @@ Use this skill when a user asks for Forge-style workflows such as:
 - `/forge:capture`
 - `/forge:worktree`
 - `/forge:suggest-cleanups`
+- `/forge:inspect-architecture`
 
 ## Purpose
 
@@ -47,6 +48,7 @@ Treat these files as authoritative:
 - `references/commands/capture.md`
 - `references/commands/worktree.md`
 - `references/commands/suggest-cleanups.md`
+- `references/commands/inspect-architecture.md`
 - `references/commands/update-docs-toc.md`
 - `references/commands/release-media.md`
 - `references/commands/update-domain-docs.md`
@@ -81,6 +83,7 @@ Use `references/command-map.md` for fast command routing.
 - User asks to capture planning into a ticket: follow `references/commands/capture.md`
 - User asks to create a worktree: follow `references/commands/worktree.md`
 - User asks to clean up old branches/worktrees: follow `references/commands/suggest-cleanups.md`
+- User asks to check architecture drift: follow `references/commands/inspect-architecture.md`
 
 ## Expected Repo Conventions
 
