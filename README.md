@@ -83,7 +83,7 @@ Example `.mcp.json`:
 |---------|-------------|
 | `/forge:audit` | Check SOC2 compliance status (read-only) |
 | `/forge:finish` | Run pre-push compliance workflow (cleanup, tests, review) |
-| `/forge:fix-pr` | Auto-fix CodeRabbit review findings in a loop |
+| `/forge:fix-pr` | Auto-fix CodeRabbit and Qodo review findings in a loop |
 
 ### Completion
 

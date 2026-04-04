@@ -1,9 +1,9 @@
 ---
-description: Fix CodeRabbit, Greptile, and Aikido findings from GitHub PR
+description: Fix CodeRabbit and Qodo findings from GitHub PR
 ---
 # /fix-pr - Fix PR Review Findings
 
-Fetch review comments from CodeRabbit, Greptile, and Aikido on the GitHub PR and fix Major/Critical issues using parallel subagents for velocity.
+Fetch review comments from CodeRabbit and Qodo on the GitHub PR and fix Major/Critical issues using parallel subagents for velocity.
 
 **Prerequisites**: GitHub token in `.forge`, review bots enabled on repo.
 
@@ -23,12 +23,11 @@ gh api repos/{owner}/{repo}/issues/{pr-number}/comments --paginate  # issue comm
 gh api graphql -f query='...' # reviewThreads query
 ```
 
-Filter by bot login: `coderabbitai[bot]`, `greptile-apps[bot]`, `aikido-pr-checks[bot]`.
+Filter by bot login: `coderabbitai[bot]`, `qodo-code-review[bot]`.
 
 **Severity classification:**
 - **CodeRabbit**: `_Critical_`/`**Critical**` and `_Major_`/`**Major**`/`Potential issue` → MUST fix. `_Minor_`/`_Trivial_`/`Nitpick` → skip.
-- **Greptile**: All findings are treated as Major (no severity labels) → MUST evaluate. Fix if valid, reply with explanation if not.
-- **Aikido**: `medium severity` and above → MUST evaluate. Fix if valid, acknowledge if repo-wide concern.
+- **Qodo**: `Bug`, `Rule violation`, `Security` tags → MUST fix. Other findings → evaluate, fix if valid.
 
 If no actionable findings, report success and exit.
 
@@ -98,7 +97,7 @@ gh pr view {pr-number} --json comments \
   --jq '.comments | map(select(.author.login == "coderabbitai")) | .[-1].body' \
   | grep -q "Currently processing"
 ```
-Once done, re-fetch comments from all three bots. **Repeat entire workflow** if new Critical/Major issues found.
+Once done, re-fetch comments from both bots. **Repeat entire workflow** if new Critical/Major issues found.
 
 ## Stopping
 Loop stops when: no Major/Critical remain, user types "stop", or GitHub API errors after 3 retries.

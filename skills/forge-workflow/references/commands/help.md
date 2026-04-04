@@ -44,7 +44,7 @@ integration tests (NO browser e2e), runs and commits. Called by /forge:finish.
 ```
 /forge:fix-pr - Fix Code Review Findings
 Part A: /code-review loop — run → fix → push → repeat until clean
-Part B: CodeRabbit loop — poll → fix Major/Critical → push → repeat
+Part B: CodeRabbit/Qodo loop — poll → fix Major/Critical → push → repeat
 ```
 
 ### /forge:help verify-pr
@@ -161,7 +161,7 @@ UTILITIES (not part of main workflow)
 /forge:pr                 Open PR in browser (or create if missing)
 /forge:audit              Dry-run of /forge:finish
 /forge:verify-pr          Build comprehensive PR audit document (SOC2)
-/forge:fix-pr             Fix code review + CodeRabbit findings
+/forge:fix-pr             Fix code review + CodeRabbit/Qodo findings
 /forge:fix-compliance     Fix SOC2 compliance CI failures
 /forge:inspect-architecture  Check architecture docs vs code
 /forge:add-tests          Generate unit/integration tests
