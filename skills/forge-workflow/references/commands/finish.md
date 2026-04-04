@@ -90,7 +90,7 @@ git push origin <branch-name>
 **Step 3 — Ask user:**
 
 After compliance doc is built, AskUserQuestion — Header: "Post-push", Question: "Run post-push review fixers?", Options:
-- "Run /fix-compliance then /fix-pr" (recommended) — waits for CI, fixes SOC2 compliance failures, then fixes CodeRabbit/Greptile/Aikido findings
+- "Run /fix-compliance then /fix-pr" (recommended) — waits for CI, fixes SOC2 compliance failures, then fixes CodeRabbit/Qodo findings
 - "Run /fix-compliance only" — just SOC2 compliance
 - "Run /fix-pr only" — just review bot findings
 - "Skip" — done for now
