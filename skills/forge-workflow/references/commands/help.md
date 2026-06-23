@@ -11,7 +11,9 @@ If user runs `/forge:help <command>`, show detailed help for that command:
 ```
 /forge:start [issue-id] - Start Working on a Linear Issue
 Shows assigned issues (or fetches by ID), creates branch from staging,
-draft PR, worktree, opens tmux with Claude or Codex, runs /forge:load.
+draft PR, worktree, then dispatches a Claude background agent
+(claude --bg) that runs /forge:load in the worktree.
+Monitor agents with `claude agents`; jump in with `claude attach <id>`.
 ```
 
 ### /forge:help finish
@@ -30,7 +32,7 @@ Requires plugins: code-simplifier, code-review (install via /forge:setup)
 ```
 /forge:cleanup - Clean Up After PR Merge
 Verifies no uncommitted changes, confirms PR is MERGED, removes worktree,
-deletes local+remote branch, kills tmux session.
+deletes local+remote branch, stops the Claude background agent (claude stop).
 ```
 
 ### /forge:help add-tests
@@ -74,15 +76,15 @@ researches codebase, creates specs/{id}.md. Asks approval at each step.
 ```
 /forge:new-issue <description> - Create Issue from Description
 Creates Linear issue, optionally improves spec with AI, then sets up
-branch, PR, worktree, tmux (full /forge:start workflow).
+branch, PR, worktree, and dispatches a Claude background agent
+(full /forge:start workflow).
 ```
 
 ### /forge:help setup
 ```
 /forge:setup - Install Development Tools & Plugins
-Installs via Homebrew: iTerm2, tmux, Marta, Meld, Linear, Slack.
-Configures ~/.tmux.conf for Claude/TUI. Installs code-simplifier and
-code-review plugins.
+Installs via Homebrew: iTerm2, Marta, Meld, Linear, Slack.
+Installs code-simplifier and code-review plugins.
 ```
 
 ### /forge:help suggest-cleanups
@@ -101,14 +103,8 @@ builds summary, requires typed confirmation word, fast-forwards main to
 staging, creates compliance archive, updates Linear.
 ```
 
-### /forge:help tmux-list
-`/forge:tmux-list` - Lists tmux sessions, lets you pick one, opens iTerm attached.
-
-### /forge:help tile
-`/forge:tile` - Tiles all tmux sessions into a single iTerm window with split panes (auto grid layout).
-
 ### /forge:help worktree
-`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, opens tmux+Claude or Codex.
+`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, dispatches a Claude background agent running /forge:load.
 
 ### /forge:help pr
 `/forge:pr` - Opens PR in browser, or creates one if missing (draft/ready, auto-populates from Linear).
@@ -124,12 +120,6 @@ staging, creates compliance archive, updates Linear.
 
 ### /forge:help vscode
 `/forge:vscode` - Opens current folder in VS Code.
-
-### /forge:help gemini
-`/forge:gemini` - Opens Gemini CLI in tmux/iTerm session.
-
-### /forge:help codex
-`/forge:codex` - Opens Codex CLI in tmux/iTerm session.
 
 ### /forge:help inspect-architecture
 ```
@@ -166,14 +156,14 @@ UTILITIES (not part of main workflow)
 /forge:inspect-architecture  Check architecture docs vs code
 /forge:add-tests          Generate unit/integration tests
 /forge:release            Promote staging to production
-/forge:tmux-list          List tmux sessions and attach in iTerm
-/forge:tile               Tile tmux sessions into iTerm panes
 /forge:suggest-cleanups   Bulk cleanup merged worktrees/branches
 /forge:vscode             Open current folder in VS Code
-/forge:gemini             Open Gemini CLI agent in tmux/iTerm
-/forge:codex              Open Codex CLI agent in tmux/iTerm
-/forge:setup              Install dev tools (iTerm, tmux, Marta, etc.)
+/forge:setup              Install dev tools (iTerm, Marta, etc.)
 /forge:release-media      Generate PDF/MP3/MP4 from markdown or tickets
+
+Background agents (dispatched by start/new-issue/worktree) are
+managed natively: `claude agents` (dashboard), `claude attach <id>`
+(jump in), `claude logs <id>` (peek), `claude stop <id>` (stop).
 
 /forge:about              Learn how Forge makes SOC2 a superpower
 /forge:help               This message

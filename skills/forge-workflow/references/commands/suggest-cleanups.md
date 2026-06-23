@@ -64,10 +64,13 @@ rm -rf "${WORKTREE_PATH}" 2>/dev/null
 git -C "${WORKTREE_REPO_PATH}" branch -D "${BRANCH}" 2>/dev/null
 # 3. Delete remote branch
 git -C "${WORKTREE_REPO_PATH}" push origin --delete "${BRANCH}" 2>/dev/null
-# 4. Kill tmux session (try both branch name and issue ID)
-tmux kill-session -t "${BRANCH}" 2>/dev/null || true
+# 4. Stop background agent (try both branch name and issue ID); use stop, not rm — forge owns the worktree
 ISSUE_ID=$(echo "${BRANCH}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
-[ -n "${ISSUE_ID}" ] && tmux kill-session -t "${ISSUE_ID}" 2>/dev/null || true
+for NAME in "${BRANCH}" "${ISSUE_ID}"; do
+  [ -z "${NAME}" ] && continue
+  AGENT_ID=$(claude agents --json --all 2>/dev/null | jq -r ".[] | select(.name==\"${NAME}\" and .kind==\"background\") | .id" | head -1)
+  [ -n "${AGENT_ID}" ] && claude stop "${AGENT_ID}" 2>/dev/null || true
+done
 ```
 Report progress per branch. Continue on errors.
 

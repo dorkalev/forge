@@ -1,5 +1,5 @@
 ---
-description: Clean up a worktree after its PR is merged. Removes worktree, deletes branches, and kills tmux session. When run from main repo, discovers all your merged branches for bulk cleanup.
+description: Clean up a worktree after its PR is merged. Removes worktree, deletes branches, and stops the Claude background agent. When run from main repo, discovers all your merged branches for bulk cleanup.
 ---
 # /cleanup - Remove Merged Worktree or Bulk-Clean Merged Branches
 
@@ -54,13 +54,18 @@ Delete remote: `git -C "${MAIN_REPO_PATH}" push origin --delete "${BRANCH}" 2>/d
 
 If worktree remove fails: suggest closing editors in the worktree, then force remove.
 
-### Step 5: Report Success (BEFORE killing tmux)
+### Step 5: Report Success (BEFORE stopping the agent)
 Report: branch, worktree removed, local+remote branch deleted, now in main repo.
 
-### Step 6: Kill Tmux Session (LAST)
-**MUST be last** — killing session may terminate agent.
+### Step 6: Stop the Background Agent (LAST)
+**MUST be last** — stopping terminates the agent. The agent was dispatched with `-n "${BRANCH}"` or `-n "${ISSUE_ID}"`; look it up by name in the agent view and stop it. Use `stop` (not `rm`) — forge owns the worktree and already removed it; `claude rm` would try to manage a worktree it doesn't own.
 ```bash
-tmux kill-session -t "${BRANCH}" 2>/dev/null || true
+ISSUE_ID=$(echo "${BRANCH}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
+for NAME in "${BRANCH}" "${ISSUE_ID}"; do
+  [ -z "${NAME}" ] && continue
+  AGENT_ID=$(claude agents --json --all 2>/dev/null | jq -r ".[] | select(.name==\"${NAME}\" and .kind==\"background\") | .id" | head -1)
+  [ -n "${AGENT_ID}" ] && claude stop "${AGENT_ID}" 2>/dev/null || true
+done
 ```
 
 ---
@@ -178,10 +183,13 @@ fi
 git branch -D "${BRANCH}" 2>/dev/null
 # 3. Delete remote branch
 git push origin --delete "${BRANCH}" 2>/dev/null
-# 4. Kill tmux session (try both branch name and issue ID)
-tmux kill-session -t "${BRANCH}" 2>/dev/null || true
+# 4. Stop background agent (try both branch name and issue ID); use stop, not rm — forge owns the worktree
 ISSUE_ID=$(echo "${BRANCH}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
-[ -n "${ISSUE_ID}" ] && tmux kill-session -t "${ISSUE_ID}" 2>/dev/null || true
+for NAME in "${BRANCH}" "${ISSUE_ID}"; do
+  [ -z "${NAME}" ] && continue
+  AGENT_ID=$(claude agents --json --all 2>/dev/null | jq -r ".[] | select(.name==\"${NAME}\" and .kind==\"background\") | .id" | head -1)
+  [ -n "${AGENT_ID}" ] && claude stop "${AGENT_ID}" 2>/dev/null || true
+done
 ```
 Report progress per branch. Continue on errors.
 
@@ -200,9 +208,9 @@ Show remaining local branches, remote branches. Report summary: cleaned count, s
 - Uncommitted changes → list, suggest commit/stash
 - Unpushed commits → list, suggest push
 - PR not merged → show URL and state
-- Worktree remove fails → suggest closing editors, then force
+- Worktree remove fails → suggest closing editors (or `claude attach`ed sessions), then force
 - Remote branch already gone → skip silently
-- Tmux session gone → skip silently
+- Background agent already gone → skip silently
 - Shell cwd broken after worktree removal → use `git -C`
 
 ## Important Rules

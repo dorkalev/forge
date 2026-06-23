@@ -3,7 +3,7 @@ description: Create a new Linear issue from a description and set up the full de
 ---
 # /new-issue - Quick Issue Creation
 
-Create a new Linear issue and set up full dev environment (branch, PR, worktree, tmux). Execute steps 1-10 sequentially — do NOT enter plan mode or start implementing. This skill's ONLY job is to create the issue + dev environment; the NEW Claude or Codex instance in the worktree handles all planning/implementation via `/forge:load`.
+Create a new Linear issue and set up full dev environment (branch, PR, worktree, background agent). Execute steps 1-10 sequentially — do NOT enter plan mode or start implementing. This skill's ONLY job is to create the issue + dev environment; the dispatched Claude background agent in the worktree handles all planning/implementation via `/forge:load`.
 
 **Prerequisites**: Linear MCP configured in `.mcp.json`
 
@@ -69,35 +69,18 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 10: Open Tmux with Claude or Codex
-For Codex App users: replace claude with codex in the tmux launch step and run the same /load command.
+### Step 10: Dispatch a Claude Background Agent
 ```bash
-SESSION_NAME="${BRANCH_NAME}"
-FOLDER_NAME=$(basename "${WORKTREE_PATH}")
-tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
-tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
-tmux set-option -t "${SESSION_NAME}" status-left-length 50
-tmux rename-window -t "${SESSION_NAME}" "${IDENTIFIER}"
-tmux send-keys -t "${SESSION_NAME}" "claude" Enter
-sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/load ${IDENTIFIER}" Enter
-
-osascript -e "
-tell application \"iTerm\"
-    activate
-    set newWindow to (create window with default profile)
-    tell current session of newWindow
-        write text \"tmux attach -t ${SESSION_NAME}\"
-    end tell
-end tell
-"
+cd "${WORKTREE_PATH}"
+claude --bg -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER}"
 ```
+The agent runs `/forge:load` unattended in the worktree, registered under the name `${IDENTIFIER}`. Monitor with `claude agents`, jump in with `claude attach <id>` (Ctrl+Z detaches; it keeps running), peek with `claude logs <id>`.
 
-**Output**: Report Issue ID, Title, Linear URL, Branch, PR URL, Worktree path.
+**Output**: Report Issue ID, Title, Linear URL, Branch, PR URL, Worktree path, and the dispatched background agent name (view with `claude agents`).
 
 ## Error Handling
 - **Linear MCP not available**: suggest configuring `.mcp.json`
 - **No description**: ask user
 - **Branch creation fails**: report error
 
-If user starts discussing implementation mid-workflow: capture details for the issue, finish setup, remind the NEW Claude session handles planning.
+If user starts discussing implementation mid-workflow: capture details for the issue, finish setup, remind them the dispatched background agent handles planning.
