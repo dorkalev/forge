@@ -13,8 +13,7 @@ If not installed: `Install Homebrew first, then run /forge:setup again.`
 
 | Tool | Description | Method |
 |------|-------------|--------|
-| iTerm2 | Terminal with tmux integration | `brew install --cask iterm2` |
-| tmux | Session management | `brew install tmux` |
+| iTerm2 | Terminal (used for `claude attach`) | `brew install --cask iterm2` |
 | Marta | Dual-pane file manager | `brew install --cask marta` |
 | Meld | Visual diff/merge | `brew install --cask meld` |
 | Linear | Issue tracking | `brew install --cask linear-linear` |
@@ -28,32 +27,7 @@ AskUserQuestion — Header: "Install", Options: "Install all", "Select tools" (m
 ### Step 4: Install
 Run selected `brew install` commands. Report progress per tool. Skip already-installed tools.
 
-### Step 5: Configure tmux
-
-If `~/.tmux.conf` exists, ask before overwriting (AskUserQuestion — Header: "Config", Options: "Replace", "Skip").
-
-```bash
-cat > ~/.tmux.conf << 'EOF'
-# Fix Claude / TUI rendering
-set -g mouse on
-set -g default-terminal "tmux-256color"
-set -ag terminal-overrides ",xterm-256color:RGB"
-set -g history-limit 50000
-set -s escape-time 0
-set -g focus-events on
-
-# Prevent accidental freezes
-unbind C-s
-unbind C-q
-
-# Quality of life
-bind r source-file ~/.tmux.conf \; display "Config reloaded!"
-bind | split-window -h
-bind - split-window -v
-EOF
-```
-
-### Step 6: Install Claude Code Plugins
+### Step 5: Install Claude Code Plugins
 AskUserQuestion — Header: "Plugins", Options: "Install both (Recommended)" (code-simplifier + code-review), "Skip".
 ```bash
 claude plugin install code-simplifier
@@ -61,8 +35,8 @@ claude plugin install code-review
 ```
 Note: restart Claude Code after plugin installation.
 
-### Step 7: Summary
-Report installed tools, configured tmux, installed plugins. Suggest: set iTerm2 as default terminal, sign in to Linear/Slack, restart Claude Code, run `/forge:start`.
+### Step 6: Summary
+Report installed tools and plugins. Suggest: set iTerm2 as default terminal, sign in to Linear/Slack, restart Claude Code, run `/forge:start`. Background agents are monitored with `claude agents` — no extra tooling needed.
 
 ## Error Handling
 - Already installed → skip, note | Install fails → show error, continue | No admin rights → suggest sudo

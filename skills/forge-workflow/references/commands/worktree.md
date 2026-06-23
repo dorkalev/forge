@@ -33,33 +33,17 @@ ln -sf "${WORKTREE_REPO_PATH}/.forge" "${WORKTREE_PATH}/.forge"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 6: Open Tmux with Claude or Codex in iTerm
-For Codex App users: replace claude with codex in the tmux launch step and run the same /load command.
+### Step 6: Dispatch a Claude Background Agent
 ```bash
 ISSUE_ID=$(echo "${BRANCH_NAME}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
-SESSION_NAME="${BRANCH_NAME}"
-FOLDER_NAME=$(basename "${WORKTREE_PATH}")
-tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
-tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
-tmux set-option -t "${SESSION_NAME}" status-left-length 50
-tmux rename-window -t "${SESSION_NAME}" "${ISSUE_ID}"
-tmux send-keys -t "${SESSION_NAME}" "claude" Enter
-sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/load ${ISSUE_ID}" Enter
-
-osascript -e "
-tell application \"iTerm\"
-    activate
-    set newWindow to (create window with default profile)
-    tell current session of newWindow
-        write text \"tmux attach -t ${SESSION_NAME}\"
-    end tell
-end tell
-"
+cd "${WORKTREE_PATH}"
+claude --bg -n "${ISSUE_ID:-$(basename "${WORKTREE_PATH}")}" "/forge:load ${ISSUE_ID}"
 ```
-If no issue ID in branch name, just create worktree without an automatic agent prompt.
+The agent runs unattended in the worktree. Monitor with `claude agents`, jump in with `claude attach <id>` (Ctrl+Z detaches; it keeps running), peek with `claude logs <id>`.
 
-**Output**: Report Branch, Worktree path, Tmux session.
+If no issue ID in branch name, dispatch without the `/forge:load` prompt (drop the trailing argument) — or skip dispatch and just report the worktree path.
+
+**Output**: Report Branch, Worktree path, and the dispatched background agent name (view with `claude agents`).
 
 ## Error Handling
-- Branch not found → list matching branches | Worktree exists → report path, ask to open | No issue ID → skip automatic agent prompt
+- Branch not found → list matching branches | Worktree exists → report path, ask to open | No issue ID → dispatch without an automatic prompt (or skip dispatch)

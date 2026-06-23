@@ -1,5 +1,5 @@
 ---
-description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and opens Claude/Codex in tmux with the issue.
+description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and dispatches a Claude background agent for the issue.
 ---
 # /start - Start Working on a Linear Issue
 
@@ -92,30 +92,17 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Update Linear & Open Tmux
-For Codex App users: replace claude with codex in the tmux launch step and run the same /forge:load command.
+### Update Linear & Dispatch Background Agent
 Move to "In Progress": `linear_update_issue(issueId: "<id>", status: "In Progress")`
-```bash
-SESSION_NAME="${IDENTIFIER}"
-FOLDER_NAME=$(basename "${WORKTREE_PATH}")
-tmux new-session -d -s "${SESSION_NAME}" -c "${WORKTREE_PATH}"
-tmux set-option -t "${SESSION_NAME}" status-left "[${FOLDER_NAME}] "
-tmux set-option -t "${SESSION_NAME}" status-left-length 50
-tmux send-keys -t "${SESSION_NAME}" "unset CLAUDECODE && claude" Enter
-sleep 3
-tmux send-keys -t "${SESSION_NAME}" "/forge:load ${IDENTIFIER}" Enter
 
-osascript -e "
-tell application \"iTerm\"
-    activate
-    set newWindow to (create window with default profile)
-    tell current session of newWindow
-        write text \"tmux attach -t ${SESSION_NAME}\"
-    end tell
-end tell
-"
+Dispatch a Claude background agent that runs `/forge:load` in the worktree:
+```bash
+cd "${WORKTREE_PATH}"
+claude --bg -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER}"
 ```
-**Output**: Report Issue ID, Branch, PR URL, Worktree path, Tmux session name.
+The agent runs unattended in the worktree, registered under the name `${IDENTIFIER}`. Manage it with `claude agents` (dashboard), `claude attach <id>` (jump in; Ctrl+Z detaches and it keeps running), `claude logs <id>` (peek), `claude stop <id>` (pause).
+
+**Output**: Report Issue ID, Branch, PR URL, Worktree path, and the dispatched background agent name (view with `claude agents`).
 
 ## Error Handling
 - Linear MCP unavailable → ask user to configure `.mcp.json`
