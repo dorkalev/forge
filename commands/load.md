@@ -11,6 +11,18 @@ description: Fetch Linear issue, save requirements, and create technical impleme
 /load PROJ-277
 ```
 
+### Unattended Mode (`--unattended`)
+
+When invoked with `--unattended` (the dispatched background agent always is), run the
+**entire flow without stopping to ask the user anything**:
+- **Do NOT call `AskUserQuestion`.** Skip every "approve / modify / skip" and "proceed / modify / discuss" gate below — treat each as auto-approved.
+- Make best-judgment decisions. When a choice is ambiguous, pick the most reasonable option and **record the assumption** in the relevant `issues/{ID}.md` or `specs/{id}.md` ("Assumptions" section) so it's auditable.
+- After the spec is approved-by-default, **implement the change**, then run `/forge:verify {ID} --unattended` as the end-of-implementation step.
+- Only stop for a **truly blocking external need** the agent cannot resolve itself: missing auth/credentials, missing access, or a Linear/MCP outage. Log it clearly and halt; never block on a stylistic or scoping question.
+
+Interactive mode (no `--unattended`) keeps all the approval gates described below.
+
+
 ### Phase 1: Setup
 
 1. **Parse Issue ID**: Extract prefix from existing issues or Linear workspace. Numeric only → add prefix. Normalize uppercase.

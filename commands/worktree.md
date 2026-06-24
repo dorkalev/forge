@@ -38,7 +38,7 @@ cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || 
 ```bash
 ISSUE_ID=$(echo "${BRANCH_NAME}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
 cd "${WORKTREE_PATH}"
-claude --bg -n "${ISSUE_ID:-$(basename "${WORKTREE_PATH}")}" "/forge:load ${ISSUE_ID}"
+claude --bg --dangerously-skip-permissions -n "${ISSUE_ID:-$(basename "${WORKTREE_PATH}")}" "/forge:load ${ISSUE_ID} --unattended"
 ```
 The agent runs unattended in the worktree. Monitor with `claude agents`, jump in with `claude attach <id>` (Ctrl+Z detaches; it keeps running), peek with `claude logs <id>`.
 

@@ -98,7 +98,7 @@ Move to "In Progress": `linear_update_issue(issueId: "<id>", status: "In Progres
 Dispatch a Claude background agent that runs `/forge:load` in the worktree:
 ```bash
 cd "${WORKTREE_PATH}"
-claude --bg -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER}"
+claude --bg --dangerously-skip-permissions -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER} --unattended"
 ```
 The agent runs unattended in `${WORKTREE_PATH}` and registers in the agent view under the name `${IDENTIFIER}`. Manage it with:
 - `claude agents` — the menu/dashboard of all running agents (replaces tmux)

@@ -16,8 +16,9 @@ screenshots to the Linear ticket on success.
 - App runs locally (dev server) for web tickets
 
 ```
-/verify              # infer issue ID from current branch
+/verify                  # infer issue ID from current branch
 /verify PROJ-277
+/verify PROJ-277 --unattended   # dispatched-agent mode; never prompts (no-op flag, already non-interactive)
 ```
 
 ---
