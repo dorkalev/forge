@@ -72,6 +72,8 @@ After all children processed:
 
 Report: feature description, all files created, numbered implementation steps, complexity estimate (Low/Medium/High). Ask: proceed, modify, or discuss?
 
+**After implementation completes** (code written for a web ticket), run `/forge:verify {ISSUE-ID}` as the end-of-implementation step: it drives the running app in a real browser against the acceptance criteria, auto-fixes breakage (capped retries), and posts the verified user story + screenshots to Linear. Don't mark work ready until verification passes.
+
 ## Error Handling
 - **Linear MCP not available**: ask user to configure `.mcp.json`
 - **Issue not found**: suggest checking ID
