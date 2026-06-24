@@ -49,6 +49,16 @@ Part A: /code-review loop — run → fix → push → repeat until clean
 Part B: CodeRabbit/Qodo loop — poll → fix Major/Critical → push → repeat
 ```
 
+### /forge:help verify
+```
+/forge:verify [issue-id] - Prove the Feature in a Real Browser
+Drives the running app as the user/"hacker" via Playwright against the issue's
+acceptance criteria. Collects screenshot + console + network evidence per case,
+auto-fixes breakage (max 3 cycles), and on success posts the verified user story
+plus screenshots to the Linear ticket. End-of-implementation step (run after coding).
+NOTE: different from /forge:verify-pr (SOC2 doc) — this one drives a browser.
+```
+
 ### /forge:help verify-pr
 ```
 /forge:verify-pr [--fix] - Build PR Compliance Document (SOC2)

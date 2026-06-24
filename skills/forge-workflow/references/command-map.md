@@ -13,6 +13,7 @@ Use this map to choose the right Forge command spec quickly.
 - Fix CI compliance failures: `references/commands/fix-compliance.md`
 - Compliance check (read-only): `references/commands/audit.md`
 - Architecture drift inspection: `references/commands/inspect-architecture.md`
+- Prove feature in a real browser (Playwright evidence + Linear post): `references/commands/verify.md`
 - PR compliance body build: `references/commands/verify-pr.md`
 - Document hotfix and backport: `references/commands/hotfix.md`
 - Release to production: `references/commands/release.md`
