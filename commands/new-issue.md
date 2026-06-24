@@ -72,7 +72,7 @@ cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || 
 ### Step 10: Dispatch a Claude Background Agent
 ```bash
 cd "${WORKTREE_PATH}"
-claude --bg -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER}"
+claude --bg --dangerously-skip-permissions -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER} --unattended"
 ```
 The agent runs `/forge:load` unattended in the worktree, registered under the name `${IDENTIFIER}`. Monitor with `claude agents`, jump in with `claude attach <id>` (Ctrl+Z detaches; it keeps running), peek with `claude logs <id>`.
 
