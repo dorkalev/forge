@@ -25,7 +25,7 @@ screenshots to the Linear ticket on success.
 
 ### Phase 1: Resolve Issue & Load Acceptance Criteria
 
-1. **Issue ID**: from argument, else parse from branch (`git rev-parse --abbrev-ref HEAD` → leading `{ID}` per `{ID}-{slug}` convention).
+1. **Issue ID**: from argument, else parse from branch (`git rev-parse --abbrev-ref HEAD` → leading `{ID}` per `{ID}-{slug}` convention). Ignore a `--unattended` token if present — it is a mode flag, not the ID (and a no-op here, since this command never prompts).
 2. Read `issues/{ID}.md` → extract **User Stories** and **Acceptance Criteria** checkboxes.
 3. If the file is missing, `linear_get_issue(id)` and derive criteria from the description.
 4. **Each acceptance criterion becomes one verification case.** If a criterion is not browser-observable (pure backend), note it as "not browser-verifiable here" and skip — don't fake evidence.
@@ -68,12 +68,24 @@ If any case **fails**:
 
 Log every dropped/uncovered case explicitly — silent truncation reads as "all verified" when it wasn't.
 
+Evidence files are artifacts, not deliverables: ensure `.forge-evidence/` is in the **target repo's** `.gitignore` (append it if missing) so screenshots are never swept into a commit by `/forge:finish`.
+
 ### Phase 6: Post Verified Story to Linear (on success)
 
-Only when **all browser-verifiable criteria pass**:
-1. Upload each evidence screenshot:
-   - `linear_prepare_attachment_upload` → upload the PNG bytes → `linear_create_attachment_from_upload` (attach to the issue).
-2. `linear_save_comment(issueId: {ID}, body: ...)` with this structure:
+Only when **all browser-verifiable criteria pass**. Upload screenshots **one at a time** — signed URLs expire in 60s and must NOT be batched (prepare → PUT → finalize one file before starting the next):
+
+1. Get the file's exact byte size: `wc -c < .forge-evidence/{ID}/{case}.png`.
+2. `prepare_attachment_upload(issue: {ID}, filename, contentType: "image/png", size)` → returns `assetUrl` + `uploadRequest{url, headers}`.
+3. **Immediately** PUT the raw bytes outside MCP, sending **every** header in `uploadRequest.headers` verbatim (changing/omitting any, including casing → HTTP 403):
+   ```bash
+   curl -X PUT --data-binary @".forge-evidence/{ID}/{case}.png" \
+     <each key:value from uploadRequest.headers, verbatim> \
+     "<uploadRequest.url>"
+   ```
+   Do not base64-encode or transform the file.
+4. After the PUT succeeds, `create_attachment_from_upload(issue: {ID}, assetUrl, title: "{case}")` to link it to the issue.
+5. Only then prepare the next screenshot.
+6. `save_comment(issueId: {ID}, body: ...)` with the structure below — embed each shot inline with `![{case}]({assetUrl})` (the `assetUrl` from step 2 renders as an image in Linear markdown):
    ```markdown
    ## ✅ Verified in browser — {ID}
 
@@ -83,7 +95,7 @@ Only when **all browser-verifiable criteria pass**:
    **As a {role}, I want {feature}…**
    1. {step} → {observed result}
    2. {step} → {observed result}
-   _Screenshot:_ {attached image}
+   ![{case}]({assetUrl})
 
    ### Adversarial checks
    - {invalid/empty/unauthorized case} → {handled as expected}
@@ -93,7 +105,7 @@ Only when **all browser-verifiable criteria pass**:
    - Network: all requests 2xx
    - Screenshots attached above
    ```
-3. Close the browser (`browser_close`) and stop the dev server.
+7. Close the browser (`browser_close`) and stop the dev server.
 
 ### Phase 7: Report
 
