@@ -75,12 +75,9 @@ The compliance checker validates that every changed file in the diff is covered 
 - Either: remove the ticket from the PR table, OR explain the ticket's coverage in the description
 
 ### For `missing_documentation`:
-- Fetch the ticket from Linear via `linear_get_issue`
-- If there is no spec comment on the ticket, draft a spec from the ticket description and `linear_save_comment(issueId, body: "## Technical Spec\n\n{spec content}")` to post it
-- Do NOT create local files
-
-### For spec inconsistencies:
-- If the compliance checker says "spec says X but PR says Y" → update the spec to match current reality
+- This means the PR description is empty or too brief (under 20 chars)
+- Rewrite or expand the PR description: `gh pr edit {number} --body "..."` or update via the PR body file
+- The body must include: Summary, Linear Tickets table, Changes section (every changed file traced to a ticket), and a Test Plan checklist
 
 ### For `missing_reviewers`:
 - The compliance comment shows `Missing: coderabbit` or similar under "Review issues"
