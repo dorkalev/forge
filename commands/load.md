@@ -83,9 +83,21 @@ Execute the implementation plan. For each task:
 
 Run linting / type checks after implementation if applicable.
 
-## Phase 4: Report
+## Phase 4: Verify (browser evidence)
 
-State: issue ID, files changed, what was done, any deferred items or open questions.
+Run `/forge:verify {ID} --unattended`:
+- Starts the dev server, drives the app in a real browser via Playwright
+- Proves each acceptance criterion; collects screenshots + console + network evidence
+- Auto-fixes breakage (max 3 cycles)
+- On success: posts verified user story + screenshots to Linear
+- Non-browser criteria (pure backend) are noted as skipped — never fabricated
+- If Playwright MCP is unavailable: skip silently and note it in the report
+
+This is the proof that the implementation actually works, not just that it compiles.
+
+## Phase 5: Report
+
+State: issue ID, files changed, what was done, verification result (pass / skip / fail with reason), any deferred items.
 
 Interactive: ask "proceed to `/forge:finish`, or discuss?"
 
