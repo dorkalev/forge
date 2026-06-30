@@ -19,7 +19,6 @@ description: Fetch Linear issue, save requirements, and create technical impleme
 ```bash
 git branch -a | grep -i "{issue-id}"
 gh pr list --search "{ISSUE-ID}" --json number,title,url,headRefName
-ls issues/*{number}* specs/*{number}* 2>/dev/null
 ```
 If found: report what exists, ask user to continue or start fresh.
 
@@ -29,8 +28,8 @@ Call `ProcessIssue({ISSUE-ID}, isRoot=true)`:
 
 1. Fetch: `linear_get_issue(id: issueId)` → title, description, state, assignee, project, labels
 2. Check children: `linear_list_issues(parentId: issueId)` — NOTE: get_issue does NOT return children
-3. **If has children**: list all, recurse each child, create parent summary files (see below), return
-4. **Draft issues/{ISSUE-ID}.md** (product-focused, NO code/architecture):
+3. **If has children**: list all, recurse each child, post parent summary comment to Linear (see below), return
+4. **Draft product summary** (in-session, no file):
    ```markdown
    # {ISSUE-ID}: {Title}
    ## Summary
@@ -46,10 +45,9 @@ Call `ProcessIssue({ISSUE-ID}, isRoot=true)`:
    ```
 5. **Show to user**, ask: "approve / modify / skip". If skip → return (no spec).
 6. **Research codebase**: analyze affected code, identify patterns, check conflicts/dependencies
-7. **Draft specs/{issue-id-lowercase}.md**:
+7. **Draft spec** (in-session, no file):
    ```markdown
    # {ISSUE-ID}: {Title} - Technical Spec
-   > See [{ISSUE-ID}](../issues/{ISSUE-ID}.md) for product requirements.
    ## Architecture Overview
    ## Implementation Plan
    ### 1. {Task} — Files: `path`, Changes: {what}
@@ -59,18 +57,23 @@ Call `ProcessIssue({ISSUE-ID}, isRoot=true)`:
    ## Open Questions
    ```
 8. **Show spec to user**, ask: "approve / modify"
-9. **Sync to Linear** (non-root only): `linear_update_issue(issueId, description: "{issues content}")`
-10. Report: `{ISSUE-ID}: {Title} — approved{, Linear updated if not root}`
+9. **Post to Linear**: `linear_save_comment(issueId, body: "## Technical Spec\n\n{spec content}")` — posts the spec as a comment on the ticket
+10. Report: `{ISSUE-ID}: {Title} — approved, spec posted to Linear`
 
-#### Parent Summary Files (for issues with children)
+#### Parent Summary Comment (for issues with children)
 
-After all children processed:
-- `issues/{PARENT-ID}.md`: Summary, Child Issues links, `- [ ] All child issues completed`
-- `specs/{parent-id}.md`: Architecture Overview (how children fit together), Child Specs links, Implementation Order (sequence + dependencies), Integration Points
+After all children processed, post a comment on the parent Linear ticket:
+- Summary of the parent feature
+- Links to all child issues
+- Architecture overview of how children fit together
+- Implementation order (sequence + dependencies)
+- Integration points
 
 ### Phase 3: Final Summary
 
-Report: feature description, all files created, numbered implementation steps, complexity estimate (Low/Medium/High). Ask: proceed, modify, or discuss?
+Report: feature description, spec posted to Linear, numbered implementation steps, complexity estimate (Low/Medium/High). Ask: proceed, modify, or discuss?
+
+**After implementation completes** (code written for a web ticket), run `/forge:verify {ISSUE-ID}` as the end-of-implementation step: it drives the running app in a real browser against the acceptance criteria, auto-fixes breakage (capped retries), and posts the verified user story + screenshots to Linear. Don't mark work ready until verification passes.
 
 ## Error Handling
 - **Linear MCP not available**: ask user to configure `.mcp.json`

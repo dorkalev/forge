@@ -34,17 +34,12 @@ BRANCH_NAME="${IDENTIFIER}-$(echo "${TITLE}" | tr '[:upper:]' '[:lower:]' | tr -
 git checkout -b "${BRANCH_NAME}" origin/staging
 ```
 
-### Step 6: Create Issue File
-Write `issues/{IDENTIFIER}.md` with Title, Priority, State, URL, Description, Tasks checklist.
-
-### Step 7: Commit and Push
+### Step 6: Push Branch
 ```bash
-git add "issues/${IDENTIFIER}.md"
-git commit -m "Add issue file for ${IDENTIFIER}"
 git push -u origin "${BRANCH_NAME}"
 ```
 
-### Step 8: Create Draft PR
+### Step 7: Create Draft PR
 ```bash
 gh pr create --draft --head "${BRANCH_NAME}" --base staging \
   --title "${IDENTIFIER}: ${TITLE}" \
@@ -57,7 +52,7 @@ gh pr create --draft --head "${BRANCH_NAME}" --base staging \
 ${DESCRIPTION}"
 ```
 
-### Step 9: Create Worktree
+### Step 8: Create Worktree
 ```bash
 WORKTREE_PATH="${WORKTREE_BASE_PATH}/${BRANCH_NAME}"
 cd "${WORKTREE_REPO_PATH}"
@@ -69,7 +64,7 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 10: Dispatch a Claude Background Agent
+### Step 9: Dispatch a Claude Background Agent
 ```bash
 cd "${WORKTREE_PATH}"
 claude --bg --dangerously-skip-permissions -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER} --unattended"

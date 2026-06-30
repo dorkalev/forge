@@ -62,6 +62,6 @@ Output:
 ## Notes
 
 - This command is idempotent — running it multiple times produces the same result
-- Domain docs should never contain ticket-specific history — that belongs in `specs/`
+- Domain docs should never contain ticket-specific history — that belongs in the Linear ticket
 - If a domain doc doesn't exist yet, skip it (creation is a separate task)
 - If changes are too extensive to summarize in-place, flag for user review

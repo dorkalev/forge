@@ -62,8 +62,8 @@ NOTE: different from /forge:verify-pr (SOC2 doc) — this one drives a browser.
 ### /forge:help verify-pr
 ```
 /forge:verify-pr [--fix] - Build PR Compliance Document (SOC2)
-Gathers tickets from commits, reads issues/ and specs/, runs MANDATORY ticket
-traceability check, prompts for acceptance criteria verification, detects
+Gathers tickets from commits, reads Linear tickets + spec comments, runs MANDATORY
+ticket traceability check, prompts for acceptance criteria verification, detects
 unspecced changes, builds comprehensive PR body, cross-links to Linear.
 Called by /forge:finish at Phase 8.5.
 ```
@@ -71,15 +71,15 @@ Called by /forge:finish at Phase 8.5.
 ### /forge:help audit
 ```
 /forge:audit - Read-Only Compliance Check
-Checks: issue file, spec file, spec alignment, tests, Linear status,
+Checks: spec alignment (vs Linear spec comment), tests, Linear status,
 PR status, PR body completeness (SOC2 sections), secrets. No changes made.
 ```
 
 ### /forge:help load
 ```
 /forge:load <id> - Load Issue and Create Plan
-Fetches Linear issue (recursive for parent/child), saves issues/{ID}.md,
-researches codebase, creates specs/{id}.md. Asks approval at each step.
+Fetches Linear issue (recursive for parent/child), researches codebase,
+drafts spec, posts it as a comment on the Linear ticket. Asks approval at each step.
 ```
 
 ### /forge:help new-issue
@@ -120,7 +120,7 @@ staging, creates compliance archive, updates Linear.
 `/forge:pr` - Opens PR in browser, or creates one if missing (draft/ready, auto-populates from Linear).
 
 ### /forge:help capture
-`/forge:capture` - Extracts planning discussion into Linear issue + issues/{ID}.md + specs/{id}.md.
+`/forge:capture` - Extracts planning discussion into a Linear issue, posts spec as a comment on the ticket.
 
 ### /forge:help fix-compliance
 `/forge:fix-compliance` - Fixes SOC2 CI failures: missing tickets, inherited merge tickets, invalid tickets.

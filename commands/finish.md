@@ -7,8 +7,6 @@ description: Run pre-push compliance workflow (cleanup, tests, sync)
 
 Use TaskCreate at START for each phase, update to `in_progress` then `completed`.
 
-Documentation: `issues/` = Product (WHAT & WHY, no code), `specs/` = Technical (HOW).
-
 ### Phase 1: Discover & Cleanup
 
 Run ALL of these in parallel (single message, multiple tool calls):
@@ -23,37 +21,34 @@ git status --short
 ```
 
 **Parallel group B — context (run as parallel Task agents or tool calls):**
-- Read `issues/ENG-*.md` and `specs/*.md` files (Glob + Read)
-- Fetch Linear ticket via MCP (`linear_get_issue`)
+- Fetch Linear ticket via MCP (`linear_get_issue`) — read comments for the spec posted by `/load`
 - Cleanup: remove temp files (*.pyc, __pycache__, .DS_Store, *.log), run linting
 
-After all complete, you have: branch name, full diff, issues/specs content, Linear ticket, clean working tree.
+After all complete, you have: branch name, full diff, Linear ticket + spec comment, clean working tree.
 
 ### Phase 2: Spec Alignment (CRITICAL)
 
-Ensure alignment between **Linear ticket** (authoritative), **`issues/`**, **`specs/`**, and **actual diff**.
+Ensure alignment between **Linear ticket + spec comment** (authoritative) and **actual diff**.
 
-Compare all 4 sources, classify misalignments:
+Compare both sources, classify misalignments:
 
 | Type | Meaning | Resolution |
 |------|---------|------------|
-| UNSPECCED | Implemented but not in any spec | Add to Linear, create new issue, or remove code |
-| DRIFT | Linear ≠ issues/ file | Sync from Linear, or update Linear |
+| UNSPECCED | Implemented but not in spec comment | Add to Linear ticket, create new issue, or remove code |
 | INCOMPLETE | Spec'd but not implemented | Implement, descope with comment, or defer |
-| SCOPE_CREEP | Beyond all specs | Expand scope in Linear, new issue, or remove |
+| SCOPE_CREEP | Beyond the ticket scope | Expand scope in Linear, new issue, or remove code |
 
-Present each to user, resolve via `linear_update_issue`, `linear_create_issue`, or `linear_create_comment`.
+Present each to user, resolve via `linear_update_issue`, `linear_create_issue`, or `linear_save_comment`.
 **Do NOT proceed until aligned.**
 
 ### Phase 3: Update Docs (parallel)
 
 Launch ALL of these in parallel (single message, multiple tool calls):
 
-1. **Update issues/ file** — `- [ ]` → `- [x]`, sync to Linear via `linear_update_issue`
-2. **Update specs/ file** — reflect current implementation
-3. **`/forge:update-domain-docs`** — refresh domain docs affected by code changes (Task subagent)
-4. **`/forge:update-docs-toc`** — update CLAUDE.md documentation section (Task subagent)
-5. **`/forge:inspect-architecture`** — check architecture docs vs code, report-only mode (no interactive prompts). Checks system shape only: services, communication patterns, structural rules (not product, not implementation details). If FAIL findings exist, flag for user attention before proceeding.
+1. **Update Linear ticket** — check off completed acceptance criteria via `linear_update_issue`; post a final summary comment if implementation diverged from the spec
+2. **`/forge:update-domain-docs`** — refresh domain docs affected by code changes (Task subagent)
+3. **`/forge:update-docs-toc`** — update CLAUDE.md documentation section (Task subagent)
+4. **`/forge:inspect-architecture`** — check architecture docs vs code, report-only mode (no interactive prompts). Checks system shape only: services, communication patterns, structural rules (not product, not implementation details). If FAIL findings exist, flag for user attention before proceeding.
 
 Wait for all to complete before proceeding.
 

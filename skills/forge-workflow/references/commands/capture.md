@@ -18,42 +18,37 @@ AskUserQuestion: Priority (Urgent/High/Medium/Low/None), Labels (comma-separated
 
 **CRITICAL**: Extract `ISSUE_ID` and `URL` from the API response. Use ONLY the returned identifier — NEVER fabricate or guess an issue ID. Do NOT proceed to Phase 4 until the issue exists in Linear.
 
-### Phase 4: Save Product Requirements
-Create `issues/{ISSUE_ID}-{number}.md`:
+### Phase 4: Post Spec to Linear
+Post the technical spec as a comment on the newly created issue:
 ```markdown
-# {ISSUE_ID}-{number}: {Title}
-**Priority:** {Priority}  **State:** Backlog  **URL:** {url}
-## Summary
-{2-3 sentence business description}
-## User Stories
-- As a {role}, I want {feature} so that {benefit}
-## Acceptance Criteria
-- [ ] {Criteria}
-## Business Rules
-- {Rules}
-## Out of Scope
-- {Exclusions}
-```
-DO NOT include file paths, code snippets, or architecture details.
+## Technical Spec
 
-### Phase 5: Save Technical Spec
-Create `specs/{issue}-{number}-{feature-name}.md`:
-```markdown
-# {ISSUE-ID}: {Title} - Technical Spec
-> See [{ISSUE-ID}](../issues/{ISSUE-ID}.md) for product requirements.
-## Overview
-## Architecture
-## Implementation Plan
-### 1. {Task} — Files: `path`, Changes: {what}
-## Edge Cases & Error Handling
-## Testing Strategy
-## Open Questions
-```
+### Overview
+{from conversation}
 
-### Phase 6: Output
-Report: Linear issue URL, files saved (issues/ and specs/), next steps (create branch or `/start`).
+### Architecture
+{from conversation}
+
+### Implementation Plan
+1. {Task} — Files: `path`, Changes: {what}
+
+### Edge Cases & Error Handling
+{from conversation}
+
+### Testing Strategy
+{from conversation}
+
+### Open Questions
+{from conversation}
+```
+`linear_save_comment(issueId: ISSUE_ID, body: spec_content)`
+
+DO NOT save any local files (no issues/ or specs/ directories).
+
+### Phase 5: Output
+Report: Linear issue URL, spec posted as comment, next steps (create branch or `/start`).
 
 ## Error Handling
 - **Linear MCP not available**: ask user to configure `.mcp.json`
 - **No clear feature**: ask user to clarify
-- **Issue creation fails**: don't create local files, report error
+- **Issue creation fails**: don't post spec, report error
