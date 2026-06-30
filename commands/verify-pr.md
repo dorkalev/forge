@@ -23,13 +23,9 @@ If no PR: `No PR found. Run /forge:pr first.`
 
 **1.2** Extract tickets from non-merge commits on this branch only: `git log origin/staging..HEAD --no-merges --first-parent --format="%s%n%b"`. Read `.forge` for `LINEAR_PROJECTS`. Build regex patterns dynamically. Extract unique ticket IDs. **IMPORTANT:** `--first-parent` excludes commits inherited from merging origin/staging — only commits authored on this branch are considered.
 
-**1.3** Read `issues/{TICKET_ID}.md` (Summary, Acceptance Criteria, Out of Scope). If missing, `linear_get_issue(id)`.
+**1.3** Fetch each ticket from Linear: `linear_get_issue(id)` → Summary, Acceptance Criteria, Out of Scope, spec comment (posted by `/forge:load`).
 
-**1.4** Find spec: `ls specs/*${TICKET_ID}*.md`. Parse Architecture Summary, Key Changes, Decisions.
-
-**1.5** Verify each ticket in Linear: `linear_get_issue(id)`
-
-**1.6: MANDATORY Ticket Traceability Check (BLOCKING)**
+**1.4: MANDATORY Ticket Traceability Check (BLOCKING)**
 ```bash
 COMMITS_TICKETS=$(git log origin/staging..HEAD --no-merges --first-parent --format="%s%n%b" | grep -oE "[A-Z]+-[0-9]+" | sort -u)
 PR_BODY=$(gh pr view --json body -q '.body')
@@ -51,8 +47,8 @@ For each acceptance criterion, AskUserQuestion — Header: "Verify", Question: "
 
 **4.1 TL;DR** — One sentence: primary ticket + key change.
 **4.2 Linear Tickets** — `| Ticket | Title | Status |` with links to Linear.
-**4.3 Product Requirements** — From `issues/`: Summary, Acceptance Criteria (`| # | Criterion | Status | Verification |`), Out of Scope. Multiple tickets → subsections per ticket.
-**4.4 Technical Implementation** — From `specs/`: Architecture Summary, Key Changes (`| File | Change | Description |` from `git diff origin/origin/staging..HEAD --stat`).
+**4.3 Product Requirements** — From Linear ticket: Summary, Acceptance Criteria (`| # | Criterion | Status | Verification |`), Out of Scope. Multiple tickets → subsections per ticket.
+**4.4 Technical Implementation** — From the spec comment on the Linear ticket (posted by `/forge:load`), supplemented by commits. Key Changes: `| File | Change | Description |` from `git diff origin/origin/staging..HEAD --stat`.
 **4.5 Notable Decisions** — From spec's decisions/trade-offs. Omit if none.
 **4.6 Testing & Verification** — `| Type | Status | Details |` (Unit/Integration/Manual). Detect tests: `git diff origin/origin/staging..HEAD --name-only | grep -E "test_|_test\.|\.test\."`
 **4.7 Audit Trail** — Ticket linkage + scope changes from Phase 3.
@@ -69,7 +65,6 @@ For each acceptance criterion, AskUserQuestion — Header: "Verify", Question: "
 Report sections built, criteria verified count, cross-links, pass/fail. Failure blocks `/forge:finish`.
 
 ## Edge Cases
-- **No issue file**: Fetch from Linear, note "generated from Linear" in Audit Trail
-- **No spec file**: Use commits for Technical Implementation, note in Audit Trail
+- **No spec comment**: Use ticket description for Product Requirements, use commits for Technical Implementation, note in Audit Trail
 - **Multiple tickets**: Primary → TL;DR; each → Product Requirements subsection; single Technical Implementation
 - **Large PRs**: `<details>` for lengthy sections; TL;DR, Tickets, Testing always visible

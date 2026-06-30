@@ -75,9 +75,9 @@ The compliance checker validates that every changed file in the diff is covered 
 - Either: remove the ticket from the PR table, OR explain the ticket's coverage in the description
 
 ### For `missing_documentation`:
-- `TICKET: no issues/ file found` → Create `issues/{TICKET}.md` (non-technical product requirements)
-- `TICKET: no specs/ file found` → Create `specs/{feature-name}.md` (technical spec)
-- Fetch ticket from Linear for content, keep issues/ non-technical
+- Fetch the ticket from Linear via `linear_get_issue`
+- If there is no spec comment on the ticket, draft a spec from the ticket description and `linear_save_comment(issueId, body: "## Technical Spec\n\n{spec content}")` to post it
+- Do NOT create local files
 
 ### For spec inconsistencies:
 - If the compliance checker says "spec says X but PR says Y" → update the spec to match current reality
@@ -107,11 +107,9 @@ Ensure the PR body includes ALL of these:
 
 **The Changes section is what the compliance checker validates most strictly.** Every file in the diff must be traceable to a ticket through this section.
 
-## Phase 3: Commit, Push, and Update PR
+## Phase 3: Push and Update PR
 ```bash
-# Commit any new files (issues/specs)
-git add issues/ specs/
-git commit -m "BOL-XXX: Add compliance documentation"
+# Push any code changes
 git push
 
 # Update PR body

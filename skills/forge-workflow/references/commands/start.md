@@ -24,26 +24,8 @@ WORKTREE_BASE_PATH=$(grep '^WORKTREE_BASE_PATH=' .forge | cut -d= -f2)
    git fetch origin staging
    git checkout -b "${BRANCH_NAME}" origin/staging
    ```
-3. Create `issues/{IDENTIFIER}.md`:
-   ```markdown
-   # {IDENTIFIER}: {Title}
-
-   **Priority:** {priority}  |  **State:** {state}  |  **URL:** {url}
-
-   ## Summary
-   {description}
-
-   ## Acceptance Criteria
-   - [ ] {Extract from Linear description or prompt user}
-
-   ## Out of Scope
-   - TBD (clarify during implementation)
-   ```
-4. Optional: offer to expand the specification with AI.
-5. Commit and push:
+3. Push branch:
    ```bash
-   git add "issues/${IDENTIFIER}.md"
-   git commit -m "Add issue file for ${IDENTIFIER}"
    git push -u origin "${BRANCH_NAME}"
    ```
 

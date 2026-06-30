@@ -26,9 +26,8 @@ screenshots to the Linear ticket on success.
 ### Phase 1: Resolve Issue & Load Acceptance Criteria
 
 1. **Issue ID**: from argument, else parse from branch (`git rev-parse --abbrev-ref HEAD` → leading `{ID}` per `{ID}-{slug}` convention). Ignore a `--unattended` token if present — it is a mode flag, not the ID (and a no-op here, since this command never prompts).
-2. Read `issues/{ID}.md` → extract **User Stories** and **Acceptance Criteria** checkboxes.
-3. If the file is missing, `linear_get_issue(id)` and derive criteria from the description.
-4. **Each acceptance criterion becomes one verification case.** If a criterion is not browser-observable (pure backend), note it as "not browser-verifiable here" and skip — don't fake evidence.
+2. `linear_get_issue(id)` → extract **User Stories** and **Acceptance Criteria** from the description and spec comment.
+3. **Each acceptance criterion becomes one verification case.** If a criterion is not browser-observable (pure backend), note it as "not browser-verifiable here" and skip — don't fake evidence.
 
 If there are zero browser-observable criteria → report that and stop (nothing to prove in a browser).
 

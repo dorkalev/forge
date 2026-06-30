@@ -33,14 +33,12 @@ Generate a `## Documentation` section with grouped links:
 - [Database Admin](docs/DATABASE_ADMIN.md) — Brief title
 - [UUID Format Standard](docs/UUID_FORMAT_STANDARD.md) — Brief title
 
-### Ticket Docs
-Per-ticket product requirements in `issues/BOL-{ID}.md`, technical specs in `specs/bol-{id}-*.md`. Use `ls issues/ specs/` or glob to discover.
 ```
 
 **Rules:**
 - **Domain docs** are the 6 well-known files: `product.md`, `architecture.md`, `auth.md`, `data-pipeline.md`, `data-model.md`, `deploy.md`. List them first in a dedicated section if they exist.
 - **Reference docs** are all other `docs/*.md` files. Extract the brief title from the first `#` heading, or fall back to the filename.
-- **Ticket docs** are NOT individually listed. Just include a short note pointing to `issues/` and `specs/` directories.
+- There is no Ticket Docs section — per-ticket specs live as comments on Linear tickets, not in local files.
 - Sort entries alphabetically within each group
 - Skip sections that would have zero entries
 - Preserve ALL existing content in CLAUDE.md that is NOT between `## Documentation` markers
@@ -70,4 +68,4 @@ Output what changed:
 - This command is idempotent — running it multiple times produces the same result
 - It is automatically invoked during `/finish` (Phase 4)
 - The `## Documentation` section is machine-managed; manual edits to it will be overwritten
-- Individual `issues/` and `specs/` files are NOT listed — they are discoverable via glob
+- Per-ticket specs are stored as comments on Linear tickets, not in local files
