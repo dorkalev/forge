@@ -1,5 +1,5 @@
 ---
-description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and dispatches a Claude background agent for the issue.
+description: Start working on a Linear issue — or create a new one. Creates branch, PR, worktree, and dispatches a Claude background agent.
 ---
 # /start - Start Working on a Linear Issue
 
@@ -9,33 +9,44 @@ WORKTREE_REPO_PATH=$(grep '^WORKTREE_REPO_PATH=' .forge | cut -d= -f2)
 WORKTREE_BASE_PATH=$(grep '^WORKTREE_BASE_PATH=' .forge | cut -d= -f2)
 ```
 
-### Select Issue
-**If argument is an issue ID** (e.g., `PROJ-420`), fetch via Linear MCP, skip to Create Branch.
+### Select or Create Issue
 
-**Otherwise**, `linear_get_user_issues(limit: 100)`, sort by priority (1=urgent → 4=low), display as `| ID | Title | Priority | State |` table. AskUserQuestion — Header: "Issue", Question: "Enter issue ID or description for new issue", Options: "PROJ-XXX" and "New issue".
-- Matches `^PROJ-\d+$` or `^\d+$` → fetch that issue
-- Otherwise → this is a new issue description. Optionally improve spec with AI first. Then call `linear_create_issue` and **extract the identifier from the API response** (e.g., `PROJ-123`). Use ONLY this returned identifier for all subsequent steps — NEVER fabricate or guess an issue ID.
+**If argument looks like an issue ID** (e.g., `ENG-420`, bare number `123`):
+- Fetch via `linear_get_issue`, skip to Create Branch.
+
+**If argument is a description (text, not an ID):**
+- Optionally improve spec: briefly scan the codebase (1-2 searches), expand into Summary + Requirements + Acceptance Criteria.
+- Create via `linear_create_issue(title, description, teamId)`.
+- **CRITICAL**: Extract `IDENTIFIER`, `TITLE`, `URL` from the API response — NEVER fabricate or guess an ID.
+
+**If no argument:**
+- Call `linear_get_user_issues(limit: 100)`, sort by priority (1=urgent → 4=low).
+- Display as `| ID | Title | Priority | State |` table.
+- AskUserQuestion — Header: "Issue", Options: first few issue IDs + "New issue".
+- Bare number or `PREFIX-N` → fetch that issue. Anything else → treat as new-issue description.
 
 ### Create Branch
-1. Name: `{identifier}-{slugified-title}` (max 50 chars). **No prefix** — starts with issue identifier.
-2. Create from staging:
-   ```bash
-   cd "${WORKTREE_REPO_PATH}"
-   git fetch origin staging
-   git checkout -b "${BRANCH_NAME}" origin/staging
-   ```
-3. Push branch:
-   ```bash
-   git push -u origin "${BRANCH_NAME}"
-   ```
+
+```bash
+cd "${WORKTREE_REPO_PATH}"
+git fetch origin staging
+BRANCH_NAME="${IDENTIFIER}-$(echo "${TITLE}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/-*$//' | cut -c1-50)"
+git checkout -b "${BRANCH_NAME}" origin/staging
+git push -u origin "${BRANCH_NAME}"
+```
 
 ### Ensure Draft PR Exists
+
 ```bash
 PR_URL=$(gh pr list --head "${BRANCH_NAME}" --base staging --json url --jq '.[0].url // empty')
 
 if [[ -z "${PR_URL}" ]]; then
-  cat > /tmp/forge_pr_body.md <<EOF
-## Linear Tickets
+  gh pr create \
+    --draft \
+    --head "${BRANCH_NAME}" \
+    --base staging \
+    --title "${IDENTIFIER}: ${TITLE}" \
+    --body "## Linear Tickets
 
 | Ticket | Title | Status |
 |--------|-------|--------|
@@ -43,19 +54,7 @@ if [[ -z "${PR_URL}" ]]; then
 
 ---
 ## Description
-${DESCRIPTION}
-
----
-*Run /forge:finish to build comprehensive compliance document.*
-EOF
-
-  gh pr create \
-    --draft \
-    --head "${BRANCH_NAME}" \
-    --base staging \
-    --title "${IDENTIFIER}: ${TITLE}" \
-    --body-file /tmp/forge_pr_body.md
-
+${DESCRIPTION}"
   PR_URL=$(gh pr list --head "${BRANCH_NAME}" --base staging --json url --jq '.[0].url // empty')
 else
   echo "PR already exists: ${PR_URL}"
@@ -63,6 +62,7 @@ fi
 ```
 
 ### Create Worktree
+
 ```bash
 WORKTREE_PATH="${WORKTREE_BASE_PATH}/${BRANCH_NAME}"
 cd "${WORKTREE_REPO_PATH}"
@@ -75,20 +75,23 @@ cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || 
 ```
 
 ### Update Linear & Dispatch Background Agent
-Move to "In Progress": `linear_update_issue(issueId: "<id>", status: "In Progress")`
 
-Dispatch a Claude background agent that runs `/forge:load` in the worktree:
+Move to "In Progress": `linear_update_issue(issueId, status: "In Progress")`
+
 ```bash
 cd "${WORKTREE_PATH}"
 claude --bg --dangerously-skip-permissions -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER} --unattended"
 ```
-The agent runs unattended in `${WORKTREE_PATH}` and registers in the agent view under the name `${IDENTIFIER}`. Manage it with:
-- `claude agents` — the menu/dashboard of all running agents (replaces tmux)
-- `claude attach <id>` — jump in to watch/steer (Ctrl+Z detaches; the agent keeps running)
-- `claude logs <id>` — peek at recent output
-- `claude stop <id>` — pause (conversation kept; resume with `claude attach <id>`)
 
-**Output**: Report Issue ID, Branch, PR URL, Worktree path, and that a background agent named `${IDENTIFIER}` was dispatched (view with `claude agents`).
+The agent runs unattended in `${WORKTREE_PATH}` and appears in the agent dashboard as `${IDENTIFIER}`.
+
+Manage it with:
+- `claude agents` — dashboard of all running agents
+- `claude attach <id>` — jump in to watch or steer (Ctrl+Z detaches; agent keeps running)
+- `claude logs <id>` — peek at recent output
+- `claude stop <id>` — pause (resume with `claude attach <id>`)
+
+**Output**: Report Issue ID, Title, Branch, PR URL, Worktree path, and the dispatched agent name.
 
 ## Error Handling
 - Linear MCP unavailable → ask user to configure `.mcp.json`

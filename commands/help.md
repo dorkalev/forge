@@ -1,181 +1,122 @@
 ---
-description: List all available commands
+description: List all available forge commands
 ---
 # /help - Available Commands
-
-## Handle Arguments
-
-If user runs `/forge:help <command>`, show detailed help for that command:
-
-### /forge:help start
-```
-/forge:start [issue-id] - Start Working on a Linear Issue
-Shows assigned issues (or fetches by ID), creates branch from staging,
-draft PR, worktree, then dispatches a Claude background agent
-(claude --bg) that runs /forge:load in the worktree.
-Monitor agents with `claude agents`; jump in with `claude attach <id>`.
-```
-
-### /forge:help finish
-```
-/forge:finish - 12-Phase Compliance Workflow
-1. Discovery  2. Cleanup  2.5 Simplify  3. Spec Alignment (CRITICAL)
-4. Issue/Spec sync  5. Commit  5.5 Staging sync  6. Tests (/forge:add-tests)
-7. Push + /code-review loop  8. PR Ready + Linear sync
-8.5 PR Compliance Doc (/forge:verify-pr)  9. CodeRabbit loop
-Builds PR with: TL;DR, Product Requirements, Technical Implementation,
-Acceptance Criteria verification, Testing table, Audit Trail.
-Requires plugins: code-simplifier, code-review (install via /forge:setup)
-```
-
-### /forge:help cleanup
-```
-/forge:cleanup - Clean Up After PR Merge
-Verifies no uncommitted changes, confirms PR is MERGED, removes worktree,
-deletes local+remote branch, stops the Claude background agent (claude stop).
-```
-
-### /forge:help add-tests
-```
-/forge:add-tests - Generate Test Coverage
-Detects test patterns, identifies changes needing tests, generates unit +
-integration tests (NO browser e2e), runs and commits. Called by /forge:finish.
-```
-
-### /forge:help fix-pr
-```
-/forge:fix-pr - Fix Code Review Findings
-Part A: /code-review loop — run → fix → push → repeat until clean
-Part B: CodeRabbit/Qodo loop — poll → fix Major/Critical → push → repeat
-```
-
-### /forge:help verify
-```
-/forge:verify [issue-id] - Prove the Feature in a Real Browser
-Drives the running app as the user/"hacker" via Playwright against the issue's
-acceptance criteria. Collects screenshot + console + network evidence per case,
-auto-fixes breakage (max 3 cycles), and on success posts the verified user story
-plus screenshots to the Linear ticket. End-of-implementation step (run after coding).
-NOTE: different from /forge:verify-pr (SOC2 doc) — this one drives a browser.
-```
-
-### /forge:help verify-pr
-```
-/forge:verify-pr [--fix] - Build PR Compliance Document (SOC2)
-Gathers tickets from commits, reads Linear tickets + spec comments, runs MANDATORY
-ticket traceability check, prompts for acceptance criteria verification, detects
-unspecced changes, builds comprehensive PR body, cross-links to Linear.
-Called by /forge:finish at Phase 8.5.
-```
-
-### /forge:help audit
-```
-/forge:audit - Read-Only Compliance Check
-Checks: spec alignment (vs Linear spec comment), tests, Linear status,
-PR status, PR body completeness (SOC2 sections), secrets. No changes made.
-```
-
-### /forge:help load
-```
-/forge:load <id> - Load Issue and Create Plan
-Fetches Linear issue (recursive for parent/child), researches codebase,
-drafts spec, posts it as a comment on the Linear ticket. Asks approval at each step.
-```
-
-### /forge:help new-issue
-```
-/forge:new-issue <description> - Create Issue from Description
-Creates Linear issue, optionally improves spec with AI, then sets up
-branch, PR, worktree, and dispatches a Claude background agent
-(full /forge:start workflow).
-```
-
-### /forge:help setup
-```
-/forge:setup - Install Development Tools & Plugins
-Installs via Homebrew: iTerm2, Marta, Meld, Linear, Slack.
-Installs code-simplifier and code-review plugins.
-```
-
-### /forge:help suggest-cleanups
-```
-/forge:suggest-cleanups - Bulk Cleanup of Merged Worktrees/Branches
-Discovers all worktrees+branches, classifies as cleanable (merged PR, your
-authorship) or skipped (open PR, other user, dirty, etc.), presents plan,
-executes after approval.
-```
-
-### /forge:help release
-```
-/forge:release [--dry-run] - Production Release
-Pre-flight checks (CI, open PRs), gathers release contents (PRs, tickets),
-builds summary, requires typed confirmation word, fast-forwards main to
-staging, creates compliance archive, updates Linear.
-```
-
-### /forge:help worktree
-`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, dispatches a Claude background agent running /forge:load.
-
-### /forge:help pr
-`/forge:pr` - Opens PR in browser, or creates one if missing (draft/ready, auto-populates from Linear).
-
-### /forge:help capture
-`/forge:capture` - Extracts planning discussion into a Linear issue, posts spec as a comment on the ticket.
-
-### /forge:help fix-compliance
-`/forge:fix-compliance` - Fixes SOC2 CI failures: missing tickets, inherited merge tickets, invalid tickets.
-
-### /forge:help release-media
-`/forge:release-media` - Generates PDF/MP3/MP4 from markdown or ticket diffs (Mermaid, Google TTS, ffmpeg).
-
-### /forge:help vscode
-`/forge:vscode` - Opens current folder in VS Code.
-
-### /forge:help inspect-architecture
-```
-/forge:inspect-architecture - Architecture Drift Inspector
-Reads docs/architecture/*.md, extracts verifiable claims (file paths, services,
-configs, patterns), checks each against the codebase. Reports PASS/WARN/FAIL
-with mitigation prompts. Read-only — makes no changes.
-```
-
-### /forge:help about
-`/forge:about` - How Forge makes SOC2 compliance a competitive advantage.
 
 ## Default Output (no argument)
 
 ```
-MAIN WORKFLOW
+CORE WORKFLOW
 ─────────────
-/forge:start  →  (code)  →  /forge:finish  →  (merge)  →  /forge:cleanup
+/forge:start [id | description]   Start an issue: branch + PR + worktree + background agent
+                                  (no arg → shows your assigned issues)
+    ↓  (background agent runs /forge:load)
+/forge:finish                     Before pushing: cleanup → spec align → commit → push → PR ready
 
-That's it. 3 commands.
+FIXING (after push)
+───────────────────
+/forge:fix-compliance   Fix SOC2 CI failures
+/forge:fix-pr           Fix CodeRabbit / Qodo findings
 
+UTILITIES
+─────────
+/forge:capture          Turn this conversation into a Linear issue
+/forge:verify [id]      Prove the feature works in a real browser (Playwright)
+/forge:hotfix           Document and backport an emergency push to main
+/forge:release          Promote staging → production (with SOC2 audit trail)
 
-UTILITIES (not part of main workflow)
-─────────────────────────────────────
-/forge:new-issue <desc>   Create issue from description (skip browsing)
-/forge:capture            Turn this chat into an issue
-/forge:load <id>          Fetch issue and create technical plan
-/forge:worktree           Create worktree for existing branch
-/forge:pr                 Open PR in browser (or create if missing)
-/forge:audit              Dry-run of /forge:finish
-/forge:verify-pr          Build comprehensive PR audit document (SOC2)
-/forge:fix-pr             Fix code review + CodeRabbit/Qodo findings
-/forge:fix-compliance     Fix SOC2 compliance CI failures
-/forge:inspect-architecture  Check architecture docs vs code
-/forge:add-tests          Generate unit/integration tests
-/forge:release            Promote staging to production
-/forge:suggest-cleanups   Bulk cleanup merged worktrees/branches
-/forge:vscode             Open current folder in VS Code
-/forge:setup              Install dev tools (iTerm, Marta, etc.)
-/forge:release-media      Generate PDF/MP3/MP4 from markdown or tickets
+/forge:help             This message
+/forge:help <cmd>       Detailed help for a command
+```
 
-Background agents (dispatched by start/new-issue/worktree) are
-managed natively: `claude agents` (dashboard), `claude attach <id>`
-(jump in), `claude logs <id>` (peek), `claude stop <id>` (stop).
+Background agents are managed natively:
+- `claude agents` — dashboard of all running agents
+- `claude attach <id>` — jump in (Ctrl+Z detaches; agent keeps running)
+- `claude logs <id>` — peek at recent output
+- `claude stop <id>` — pause
 
-/forge:about              Learn how Forge makes SOC2 a superpower
-/forge:help               This message
-/forge:help <cmd>         Detailed help for a command
+---
+
+## Detailed Help
+
+### /forge:help start
+```
+/forge:start [id | description]
+  - Existing ID (e.g. ENG-420): fetches issue, skips to branch creation
+  - Text description: creates a new Linear issue first
+  - No arg: shows your assigned issues, ask which to start
+Creates branch from staging, draft PR, worktree, then dispatches:
+  claude --bg ... "/forge:load {ID} --unattended"
+Monitor with `claude agents`.
+```
+
+### /forge:help load
+```
+/forge:load [id] [--unattended]
+  Fetches Linear issue, researches codebase, drafts spec,
+  posts spec as a Linear comment, then implements the change.
+  --unattended: fully autonomous (no prompts) — used by background agents.
+  Interactive mode keeps approval gates at spec draft and after implementation.
+```
+
+### /forge:help finish
+```
+/forge:finish
+  Phase 1: git state snapshot + temp-file cleanup + linting (parallel)
+  Phase 2: spec alignment — every changed file must trace to a Linear ticket
+  Phase 3: commit + merge origin/staging
+  Phase 4: push + PR ready + Linear → "In Review"
+  Follow up with /forge:fix-compliance then /forge:fix-pr.
+```
+
+### /forge:help fix-compliance
+```
+/forge:fix-compliance [--tickets "ENG-1,ENG-2"]
+  Reads the SOC2 compliance CI comment and run logs.
+  Fixes: unspecced_changes, invalid_tickets, ghost_tickets, missing_documentation.
+  Updates PR body so every changed file is covered by a ticket.
+```
+
+### /forge:help fix-pr
+```
+/forge:fix-pr
+  Fetches CodeRabbit and Qodo review comments from the PR.
+  Fixes Critical/Major findings via parallel subagents (grouped by file).
+  Replies to each comment, resolves threads, waits for re-review.
+  Loops until no Critical/Major remain.
+```
+
+### /forge:help capture
+```
+/forge:capture
+  Reviews the current conversation, extracts feature description + spec,
+  creates a Linear issue, posts the spec as a comment on it.
+  No local files created.
+```
+
+### /forge:help verify
+```
+/forge:verify [id] [--unattended]
+  Drives the running app in a real browser via Playwright against the
+  acceptance criteria from the Linear issue. Auto-fixes breakage (max 3 cycles).
+  On success: posts verified user story + screenshots to Linear.
+  Requires: Playwright MCP + running dev server.
+```
+
+### /forge:help hotfix
+```
+/forge:hotfix [sha]
+  For emergency direct pushes to main that bypass normal PR flow.
+  Documents the incident, creates a Linear ticket, cherry-picks commits
+  onto a new branch from staging, opens a backport PR.
+```
+
+### /forge:help release
+```
+/forge:release [--dry-run]
+  Pre-flight: CI status, open PRs, staging vs main diff.
+  Gathers PRs + Linear tickets in the release.
+  Requires typed confirmation word (anti-accident).
+  Fast-forwards main to staging, creates compliance archive,
+  creates release ticket in Linear, notifies all resolved tickets.
 ```
