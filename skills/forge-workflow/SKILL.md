@@ -71,7 +71,7 @@ Use `references/command-map.md` for fast command routing.
 - User asks to start ticket work: follow `references/commands/start.md`
 - User asks to load/spec a ticket: follow `references/commands/load.md`
 - User asks to finalize before push/PR: follow `references/commands/finish.md`
-- User asks to handle CodeRabbit/Qodo findings: follow `references/commands/fix-pr.md`
+- User asks to handle CodeRabbit findings: follow `references/commands/fix-pr.md`
 - User asks to fix CI compliance failures: follow `references/commands/fix-compliance.md`
 - User asks compliance status only: follow `references/commands/audit.md`
 - User asks to build PR compliance doc: follow `references/commands/verify-pr.md`
