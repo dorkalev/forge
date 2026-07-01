@@ -16,7 +16,7 @@ CORE WORKFLOW
 FIXING (after push)
 ───────────────────
 /forge:fix-compliance   Fix SOC2 CI failures
-/forge:fix-pr           Fix CodeRabbit / Qodo findings
+/forge:fix-pr           Fix CodeRabbit findings
 
 UTILITIES
 ─────────
@@ -80,7 +80,7 @@ Monitor with `claude agents`.
 ### /forge:help fix-pr
 ```
 /forge:fix-pr
-  Fetches CodeRabbit and Qodo review comments from the PR.
+  Fetches CodeRabbit review comments from the PR.
   Fixes Critical/Major findings via parallel subagents (grouped by file).
   Replies to each comment, resolves threads, waits for re-review.
   Loops until no Critical/Major remain.

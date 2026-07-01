@@ -9,7 +9,7 @@ Use this map to choose the right Forge command spec quickly.
 - Create worktree for existing branch: `references/commands/worktree.md`
 - Main finalize flow: `references/commands/finish.md`
 - Generate tests: `references/commands/add-tests.md`
-- Fix PR bot findings (CodeRabbit/Qodo): `references/commands/fix-pr.md`
+- Fix PR bot findings (CodeRabbit): `references/commands/fix-pr.md`
 - Fix CI compliance failures: `references/commands/fix-compliance.md`
 - Compliance check (read-only): `references/commands/audit.md`
 - Architecture drift inspection: `references/commands/inspect-architecture.md`

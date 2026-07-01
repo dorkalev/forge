@@ -70,7 +70,7 @@ After push:
 ```
 Done. Next steps:
   /forge:fix-compliance   fix SOC2 CI failures
-  /forge:fix-pr           fix CodeRabbit / Qodo findings
+  /forge:fix-pr           fix CodeRabbit findings
 ```
 
 ## Quality Gates

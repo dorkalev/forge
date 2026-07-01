@@ -90,7 +90,6 @@ The compliance checker validates that every changed file in the diff is covered 
 gh pr comment {pr-number} --body "@coderabbitai resume"
 gh pr comment {pr-number} --body "@coderabbitai full review"
 ```
-- For Qodo: `@qodo-code-review review`
 - After posting, tell the user to wait for the reviewer to complete and re-push or re-run compliance
 
 ### For acceptance criteria issues:

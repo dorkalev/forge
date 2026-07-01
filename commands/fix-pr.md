@@ -1,9 +1,9 @@
 ---
-description: Fix CodeRabbit and Qodo findings from GitHub PR
+description: Fix CodeRabbit findings from GitHub PR
 ---
 # /fix-pr - Fix PR Review Findings
 
-Fetch review comments from CodeRabbit and Qodo on the GitHub PR and fix Major/Critical issues using parallel subagents for velocity.
+Fetch review comments from CodeRabbit on the GitHub PR and fix Major/Critical issues using parallel subagents for velocity.
 
 **Prerequisites**: GitHub token in `.forge`, review bots enabled on repo.
 
@@ -23,11 +23,10 @@ gh api repos/{owner}/{repo}/issues/{pr-number}/comments --paginate  # issue comm
 gh api graphql -f query='...' # reviewThreads query
 ```
 
-Filter by bot login: `coderabbitai[bot]`, `qodo-code-review[bot]`.
+Filter by bot login: `coderabbitai[bot]`.
 
 **Severity classification:**
 - **CodeRabbit**: `_Critical_`/`**Critical**` and `_Major_`/`**Major**`/`Potential issue` → MUST fix. `_Minor_`/`_Trivial_`/`Nitpick` → skip.
-- **Qodo**: `Bug`, `Rule violation`, `Security` tags → MUST fix. Other findings → evaluate, fix if valid.
 
 If no actionable findings, report success and exit.
 
