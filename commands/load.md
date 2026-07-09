@@ -7,7 +7,7 @@ description: Fetch a Linear issue, research the codebase, and implement the chan
 
 ```
 /load <id>                   # interactive: shows plan, asks for approval
-/load ENG-277 --unattended   # background agent mode: fully autonomous
+/load ENG-277 --unattended   # unattended mode: fully autonomous, no approval gates
 ```
 
 ### Arguments
@@ -18,7 +18,7 @@ description: Fetch a Linear issue, research the codebase, and implement the chan
 
 ## Unattended Mode (`--unattended`)
 
-The background agent dispatched by `/forge:start` always uses this mode.
+Use this mode only when explicitly requested (automation, no human in the loop).
 
 Run the **entire flow without stopping**:
 - **No `AskUserQuestion` calls.** All approval gates are auto-resolved.

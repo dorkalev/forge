@@ -1,5 +1,5 @@
 ---
-description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, and dispatches a Claude background agent for the issue.
+description: Show your assigned Linear issues or create a new one. Creates branch, PR, worktree, then implements the issue in the current session.
 ---
 # /start - Start Working on a Linear Issue
 
@@ -74,17 +74,10 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Update Linear & Dispatch Background Agent
+### Update Linear & Implement in This Session
 Move to "In Progress": `linear_update_issue(issueId: "<id>", status: "In Progress")`
 
-Dispatch a Claude background agent that runs `/forge:load` in the worktree:
-```bash
-cd "${WORKTREE_PATH}"
-claude --bg -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER}"
-```
-The agent runs unattended in the worktree, registered under the name `${IDENTIFIER}`. Manage it with `claude agents` (dashboard), `claude attach <id>` (jump in; Ctrl+Z detaches and it keeps running), `claude logs <id>` (peek), `claude stop <id>` (pause).
-
-**Output**: Report Issue ID, Branch, PR URL, Worktree path, and the dispatched background agent name (view with `claude agents`).
+Report Issue ID, Branch, PR URL, and Worktree path. Then continue the work **in this session** — do NOT shell out to the `claude` CLI or dispatch a background agent. Run the `/forge:load ${IDENTIFIER}` flow here, doing all file edits and git commands inside `${WORKTREE_PATH}`.
 
 ## Error Handling
 - Linear MCP unavailable → ask user to configure `.mcp.json`

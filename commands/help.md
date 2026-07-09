@@ -8,9 +8,9 @@ description: List all available forge commands
 ```
 CORE WORKFLOW
 ─────────────
-/forge:start [id | description]   Start an issue: branch + PR + worktree + background agent
+/forge:start [id | description]   Start an issue: branch + PR + worktree, then implement
                                   (no arg → shows your assigned issues)
-    ↓  (background agent runs /forge:load)
+    ↓  (continues into /forge:load in the same session)
 /forge:finish                     Before pushing: cleanup → spec align → commit → push → PR ready
 
 FIXING (after push)
@@ -29,12 +29,6 @@ UTILITIES
 /forge:help <cmd>       Detailed help for a command
 ```
 
-Background agents are managed natively:
-- `claude agents` — dashboard of all running agents
-- `claude attach <id>` — jump in (Ctrl+Z detaches; agent keeps running)
-- `claude logs <id>` — peek at recent output
-- `claude stop <id>` — pause
-
 ---
 
 ## Detailed Help
@@ -45,9 +39,8 @@ Background agents are managed natively:
   - Existing ID (e.g. ENG-420): fetches issue, skips to branch creation
   - Text description: creates a new Linear issue first
   - No arg: shows your assigned issues, ask which to start
-Creates branch from staging, draft PR, worktree, then dispatches:
-  claude --bg ... "/forge:load {ID} --unattended"
-Monitor with `claude agents`.
+Creates branch from staging, draft PR, worktree, then continues
+into /forge:load {ID} in the current session — no background agent.
 ```
 
 ### /forge:help load
@@ -55,7 +48,7 @@ Monitor with `claude agents`.
 /forge:load [id] [--unattended]
   Fetches Linear issue, researches codebase, drafts spec,
   posts spec as a Linear comment, then implements the change.
-  --unattended: fully autonomous (no prompts) — used by background agents.
+  --unattended: fully autonomous (no prompts) — for automation only.
   Interactive mode keeps approval gates at spec draft and after implementation.
 ```
 

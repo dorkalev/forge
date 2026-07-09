@@ -34,17 +34,13 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 6: Dispatch a Claude Background Agent
+### Step 6: Continue with /forge:load in This Session
 ```bash
 ISSUE_ID=$(echo "${BRANCH_NAME}" | grep -oE '^[A-Za-z]+-[0-9]+' | tr '[:lower:]' '[:upper:]')
-cd "${WORKTREE_PATH}"
-claude --bg -n "${ISSUE_ID:-$(basename "${WORKTREE_PATH}")}" "/forge:load ${ISSUE_ID}"
 ```
-The agent runs unattended in the worktree. Monitor with `claude agents`, jump in with `claude attach <id>` (Ctrl+Z detaches; it keeps running), peek with `claude logs <id>`.
+Report Branch and Worktree path. If an issue ID was extracted, continue **in this session** with the `/forge:load ${ISSUE_ID}` flow, doing all file edits and git commands inside `${WORKTREE_PATH}` — do NOT shell out to the `claude` CLI or dispatch a background agent.
 
-If no issue ID in branch name, dispatch without the `/forge:load` prompt (drop the trailing argument) — or skip dispatch and just report the worktree path.
-
-**Output**: Report Branch, Worktree path, and the dispatched background agent name (view with `claude agents`).
+If no issue ID in branch name, just report the worktree path and stop.
 
 ## Error Handling
-- Branch not found → list matching branches | Worktree exists → report path, ask to open | No issue ID → dispatch without an automatic prompt (or skip dispatch)
+- Branch not found → list matching branches | Worktree exists → report path, ask to open | No issue ID → report worktree path and stop

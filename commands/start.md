@@ -1,5 +1,5 @@
 ---
-description: Start working on a Linear issue — or create a new one. Creates branch, PR, worktree, and dispatches a Claude background agent.
+description: Start working on a Linear issue — or create a new one. Creates branch, PR, worktree, then implements the issue in the current session.
 ---
 # /start - Start Working on a Linear Issue
 
@@ -74,24 +74,11 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Update Linear & Dispatch Background Agent
+### Update Linear & Implement in This Session
 
 Move to "In Progress": `linear_update_issue(issueId, status: "In Progress")`
 
-```bash
-cd "${WORKTREE_PATH}"
-claude --bg --dangerously-skip-permissions -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER} --unattended"
-```
-
-The agent runs unattended in `${WORKTREE_PATH}` and appears in the agent dashboard as `${IDENTIFIER}`.
-
-Manage it with:
-- `claude agents` — dashboard of all running agents
-- `claude attach <id>` — jump in to watch or steer (Ctrl+Z detaches; agent keeps running)
-- `claude logs <id>` — peek at recent output
-- `claude stop <id>` — pause (resume with `claude attach <id>`)
-
-**Output**: Report Issue ID, Title, Branch, PR URL, Worktree path, and the dispatched agent name.
+Report Issue ID, Title, Branch, PR URL, and Worktree path. Then continue the work **in this session** — do NOT shell out to the `claude` CLI or dispatch a background agent. Invoke the `forge:load` skill (as if the user typed `/forge:load ${IDENTIFIER}`) and run its full flow here, doing all file edits and git commands inside `${WORKTREE_PATH}`.
 
 ## Error Handling
 - Linear MCP unavailable → ask user to configure `.mcp.json`

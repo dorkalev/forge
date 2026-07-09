@@ -3,7 +3,7 @@ description: Create a new Linear issue from a description and set up the full de
 ---
 # /new-issue - Quick Issue Creation
 
-Create a new Linear issue and set up full dev environment (branch, PR, worktree, background agent). Execute steps 1-10 sequentially — do NOT enter plan mode or start implementing. This skill's ONLY job is to create the issue + dev environment; the dispatched Claude background agent in the worktree handles all planning/implementation via `/forge:load`.
+Create a new Linear issue and set up full dev environment (branch, PR, worktree). Execute steps 1-9 sequentially — do NOT enter plan mode or start implementing mid-setup. Once setup is complete, continue in this session with the `/forge:load` flow, which handles all planning/implementation.
 
 **Prerequisites**: Linear MCP configured in `.mcp.json`
 
@@ -64,18 +64,12 @@ ln -sf "${WORKTREE_REPO_PATH}/.mcp.json" "${WORKTREE_PATH}/.mcp.json"
 cd "${WORKTREE_PATH}" && git submodule update --init --recursive 2>/dev/null || true
 ```
 
-### Step 9: Dispatch a Claude Background Agent
-```bash
-cd "${WORKTREE_PATH}"
-claude --bg -n "${IDENTIFIER}" "/forge:load ${IDENTIFIER}"
-```
-The agent runs `/forge:load` unattended in the worktree, registered under the name `${IDENTIFIER}`. Monitor with `claude agents`, jump in with `claude attach <id>` (Ctrl+Z detaches; it keeps running), peek with `claude logs <id>`.
-
-**Output**: Report Issue ID, Title, Linear URL, Branch, PR URL, Worktree path, and the dispatched background agent name (view with `claude agents`).
+### Step 9: Continue with /forge:load in This Session
+Report Issue ID, Title, Linear URL, Branch, PR URL, and Worktree path. Then continue the work **in this session** — do NOT shell out to the `claude` CLI or dispatch a background agent. Run the `/forge:load ${IDENTIFIER}` flow here, doing all file edits and git commands inside `${WORKTREE_PATH}`.
 
 ## Error Handling
 - **Linear MCP not available**: suggest configuring `.mcp.json`
 - **No description**: ask user
 - **Branch creation fails**: report error
 
-If user starts discussing implementation mid-workflow: capture details for the issue, finish setup, remind them the dispatched background agent handles planning.
+If user starts discussing implementation mid-workflow: capture details for the issue, finish setup, then fold their input into the `/forge:load` planning phase.

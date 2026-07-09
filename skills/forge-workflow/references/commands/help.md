@@ -11,9 +11,8 @@ If user runs `/forge:help <command>`, show detailed help for that command:
 ```
 /forge:start [issue-id] - Start Working on a Linear Issue
 Shows assigned issues (or fetches by ID), creates branch from staging,
-draft PR, worktree, then dispatches a Claude background agent
-(claude --bg) that runs /forge:load in the worktree.
-Monitor agents with `claude agents`; jump in with `claude attach <id>`.
+draft PR, worktree, then continues into /forge:load in the current
+session — no background agent, no `claude` CLI invocation.
 ```
 
 ### /forge:help finish
@@ -76,8 +75,8 @@ drafts spec, posts it as a comment on the Linear ticket. Asks approval at each s
 ```
 /forge:new-issue <description> - Create Issue from Description
 Creates Linear issue, optionally improves spec with AI, then sets up
-branch, PR, worktree, and dispatches a Claude background agent
-(full /forge:start workflow).
+branch, PR, worktree and continues into /forge:load in the current
+session (full /forge:start workflow).
 ```
 
 ### /forge:help setup
@@ -104,7 +103,7 @@ staging, creates compliance archive, updates Linear.
 ```
 
 ### /forge:help worktree
-`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, dispatches a Claude background agent running /forge:load.
+`/forge:worktree <id-or-branch>` - Creates worktree for existing branch, sets up env, then continues into /forge:load in the current session.
 
 ### /forge:help pr
 `/forge:pr` - Opens PR in browser, or creates one if missing (draft/ready, auto-populates from Linear).
@@ -160,10 +159,6 @@ UTILITIES (not part of main workflow)
 /forge:vscode             Open current folder in VS Code
 /forge:setup              Install dev tools (iTerm, Marta, etc.)
 /forge:release-media      Generate PDF/MP3/MP4 from markdown or tickets
-
-Background agents (dispatched by start/new-issue/worktree) are
-managed natively: `claude agents` (dashboard), `claude attach <id>`
-(jump in), `claude logs <id>` (peek), `claude stop <id>` (stop).
 
 /forge:about              Learn how Forge makes SOC2 a superpower
 /forge:help               This message
